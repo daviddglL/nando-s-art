@@ -17,7 +17,8 @@ class ProductSeeder extends Seeder
         DB::table('products')->insert([
             'name' => 'Product 1',
             'description' => 'Product 1 description',
-            'measures' => '10x10',
+            'height' => '10',
+            'width' => '20',
             'style' => 'acuarela',
             'imagen' => 'product1.jpg',
             'category' => 'retrato',

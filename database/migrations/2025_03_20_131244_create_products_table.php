@@ -17,7 +17,8 @@ return new class extends Migration
                 $table->id();
                 $table->string('name');
                 $table->longText('description');
-                $table->string('measures');
+                $table->float('height');
+                $table->float('width');
                 $table->enum('style', ['acuarela', 'rotulador','oleo','sketch','papel','lienzo']);
                 $table->string('imagen');
                 $table->enum('category', ['retrato', 'paisaje','abstracto','urbano','otro']);
