@@ -13,4 +13,13 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+Route::get('/', function () {
+    return view('landing');
+})->name('landing');
+
+Route::get('/galeria', function () {
+    return view('galeria');
+})->name('galeria');
+
+
 require __DIR__.'/auth.php';

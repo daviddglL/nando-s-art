@@ -25,27 +25,16 @@
 
     <!-- Contenedor Principal -->
 <!-- Contenedor Principal -->
-<main class="flex flex-col items-center min-h-screen">
-    <!-- Título principal -->
-    <!-- Título principal con padding superior -->
-<h2 class="text-3xl font-bold text-gray-800 pt-12 mb-4">Muestras</h2>
+<main class="flex flex-col items-center justify-center py-16 px-4 text-center">
+    <!-- Imagen redonda -->
+    <img src="{{ asset('images/nandofoto.jpg') }}" alt="Autor" class="w-40 h-40 rounded-full object-cover shadow-lg mb-6">
 
-    <div class="relative w-[calc(100vw-200px)] h-[calc(100vh-300px)] flex justify-start ml-6">
-        <!-- Pestañas tipo archivador -->
-        <div class="absolute -top-8 flex space-x-1">
-            @foreach(['Acuarela', 'Rotulador', 'Óleo', 'Sketch', 'Papel', 'Lienzo'] as $index => $style)
-                <button class="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-t-lg border border-gray-400 relative 
-                {{ $index !== 0 ? '-ml-2' : '' }} hover:bg-gray-400 transition">
-                    {{ $style }}
-                </button>
-            @endforeach
-        </div>
-
-        <!-- Caja principal -->
-        <div class="bg-white shadow-lg rounded-lg p-6 w-full h-full border border-gray-400 relative">
-        </div>
-    </div>
+    <!-- Biografía -->
+    <p class="max-w-3xl text-gray-700 text-lg leading-relaxed">
+        ¡Bienvenido a mi espacio creativo! Soy un apasionado del arte y el diseño con años de experiencia en distintas técnicas y estilos. Desde acuarelas suaves hasta trazos marcados con rotulador, cada obra cuenta una historia distinta. En este sitio comparto mi trabajo, mi evolución y mis ideas. Gracias por acompañarme en este viaje visual, donde cada imagen busca inspirar, provocar y emocionar.
+    </p>
 </main>
+
 
 
 
