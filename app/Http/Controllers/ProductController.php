@@ -10,6 +10,11 @@ class ProductController extends Controller
     {
         return Product::all();
     }
+    public function create()
+{
+    return view('admin.create'); // ← asegúrate de tener esta vista
+}
+
 
     public function store(Request $request)
     {

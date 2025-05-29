@@ -46,6 +46,14 @@
             <div id="contenedor-muestras" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full"></div>
         </div>
     </div>
+@if(Auth::check() && Auth::user()->role === 'admin')
+    <a href="{{ route('products.create') }}"
+       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+       Añadir Nueva Obra
+    </a>
+@endif
+
+
 </main>
 
 <script>
