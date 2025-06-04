@@ -1,28 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1>Bienvenido, {{ $user->name }}</h1>
-    <p>Rol: <strong>{{ $user->role }}</strong></p>
+<div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Bienvenido, {{ $user->name }}</h1>
+    <p class="text-gray-600 mb-6">Rol: <span class="font-semibold text-blue-600">{{ $user->role }}</span></p>
 
     <form method="POST" action="{{ route('logout') }}">
         @csrf
-        <button type="submit" class="btn btn-danger">Cerrar sesión</button>
+        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded shadow">
+            Cerrar sesión
+        </button>
     </form>
 </div>
 @endsection
-
-
-@if (Auth::check())
-    <div style="padding: 1rem; background: #f0f0f0; border-bottom: 1px solid #ccc;">
-        <p><strong>Usuario:</strong> {{ Auth::user()->name }}</p>
-        <p><strong>Rol:</strong> {{ Auth::user()->role }}</p>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" style="padding: 0.5rem 1rem; background-color: #c00; color: white; border: none; cursor: pointer;">
-                Cerrar sesión
-            </button>
-        </form>
-    </div>
-@endif

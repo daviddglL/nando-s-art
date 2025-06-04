@@ -18,7 +18,19 @@
             <ul class="flex space-x-6">
                 <li><a href="{{ route('landing') }}" class="text-gray-700 hover:text-gray-900">Inicio</a></li>
                 <li><a href="{{ route('galeria') }}" class="text-gray-700 hover:text-gray-900 font-semibold">Galería</a></li>
-                <li><a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:underline">Iniciar Sesión</a></li>
+                @guest
+                    <li><a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:underline">Iniciar Sesión</a></li>
+                    <li><a href="{{ route('register') }}" class="text-blue-600 font-semibold hover:underline ml-4">Crear cuenta</a></li>
+                @endguest
+
+                @auth
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="text-red-600 font-semibold hover:underline">Cerrar sesión</button>
+                        </form>
+                    </li>
+                @endauth
             </ul>
         </nav>
     </div>
@@ -28,38 +40,50 @@
 <main class="flex flex-col items-center min-h-screen">
     <h2 class="text-3xl font-bold text-gray-800 pt-12 mb-4">Muestras</h2>
 
-    <div class="relative w-[calc(100vw-200px)] h-[calc(100vh-300px)] flex justify-start ml-6">
-        <!-- Tabs -->
-        <div class="absolute -top-8 flex space-x-1">
-            @foreach(['Acuarela', 'Rotulador', 'Óleo', 'Sketch', 'Papel', 'Lienzo'] as $index => $style)
-                <button 
-                    class="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-t-lg border border-gray-400 relative filtro-estilo {{ $index !== 0 ? '-ml-2' : '' }} hover:bg-gray-400 transition"
-                    data-style="{{ strtolower($style) }}"
-                >
-                    {{ $style }}
-                </button>
-            @endforeach
-        </div>
-
-        <!-- Caja de resultados -->
-        <div class="bg-white shadow-lg rounded-lg p-6 w-full h-full border border-gray-400 relative overflow-y-auto">
-            <div id="contenedor-muestras" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full"></div>
-        </div>
+    <!-- Estilos -->
+    <div class="flex space-x-2 mb-4">
+        @foreach(['Acuarela', 'Rotulador', 'Óleo', 'Sketch', 'Papel', 'Lienzo'] as $index => $style)
+            <button 
+                class="px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded hover:bg-gray-400 filtro-estilo"
+                data-style="{{ strtolower($style) }}"
+            >
+                {{ $style }}
+            </button>
+        @endforeach
     </div>
-@if(Auth::check() && Auth::user()->role === 'admin')
-    <a href="{{ route('products.create') }}"
-       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-       Añadir Nueva Obra
-    </a>
-@endif
 
+    <!-- Carrusel -->
+    <div class="relative w-[1150px] border-2 border-gray-300 bg-white rounded-xl shadow-md px-4 py-6 overflow-hidden">
 
+        <div id="contenedor-muestras" class="flex transition-transform duration-300 ease-in-out space-x-4">
+            <!-- Tarjetas dinámicas aquí -->
+        </div>
+
+        <!-- Flechas -->
+        <button id="prev" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow p-2 rounded-full hover:bg-gray-100">
+            ◀
+        </button>
+        <button id="next" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow p-2 rounded-full hover:bg-gray-100">
+            ▶
+        </button>
+    </div>
+
+    @if(Auth::check() && Auth::user()->role === 'admin')
+        <a href="{{ route('products.create') }}"
+           class="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+           Añadir Nueva Obra
+        </a>
+    @endif
 </main>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const botones = document.querySelectorAll(".filtro-estilo");
     const contenedor = document.getElementById("contenedor-muestras");
+    const btnNext = document.getElementById("next");
+    const btnPrev = document.getElementById("prev");
+
+    let currentIndex = 0;
 
     const cargarEstilo = (estilo) => {
         fetch(`/api/products?style=${estilo}`)
@@ -73,8 +97,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 data.forEach(producto => {
+                    console.log(producto);
                     const card = document.createElement("div");
-                    card.className = "bg-white p-4 rounded-lg shadow-md border border-gray-200";
+                    card.className = "min-w-[360px] max-w-[360px] h-[500px] bg-white p-6 rounded-2xl shadow-lg border border-gray-300 flex-shrink-0 flex flex-col justify-between";
 
                     card.innerHTML = `
                         <h3 class="text-xl font-bold text-gray-800 mb-2">${producto.name}</h3>
@@ -85,8 +110,31 @@ document.addEventListener("DOMContentLoaded", () => {
                     `;
                     contenedor.appendChild(card);
                 });
+                currentIndex = 0;
+                updateCarousel();
             });
     };
+
+    const updateCarousel = () => {
+        const offset = currentIndex * 380; // nuevo ancho con margen
+
+        contenedor.style.transform = `translateX(-${offset}px)`;
+    };
+
+    btnNext.addEventListener("click", () => {
+        const max = contenedor.children.length - 3;
+        if (currentIndex < max) {
+            currentIndex++;
+            updateCarousel();
+        }
+    });
+
+    btnPrev.addEventListener("click", () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateCarousel();
+        }
+    });
 
     // Carga inicial
     cargarEstilo("acuarela");

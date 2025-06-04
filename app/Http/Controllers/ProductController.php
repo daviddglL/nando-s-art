@@ -3,6 +3,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
 
 class ProductController extends Controller
 {
@@ -16,31 +18,36 @@ class ProductController extends Controller
 }
 
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
-        ]);
 
-        return Product::create($request->all());
-    }
 
-    public function show(Product $product)
-    {
-        return $product;
-    }
+public function store(Request $request)
+{
+    $request->validate([
+        'name' => 'required',
+        'description' => 'required',
+        'height' => 'required|numeric',
+        'width' => 'required|numeric',
+        'style' => 'required|string',
+        'category' => 'required|string',
+        'imagen' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-    public function update(Request $request, Product $product)
-    {
-        $product->update($request->all());
-        return $product;
-    }
+    // Guardar la imagen
+    $imagePath = $request->file('imagen')->store('obras', 'public');
+    $imageName = basename($imagePath);
 
-    public function destroy(Product $product)
-    {
-        $product->delete();
-        return response()->json(['message' => 'Product deleted']);
-    }
+    // Crear producto
+    Product::create([
+        'name' => $request->name,
+        'description' => $request->description,
+        'height' => $request->height,
+        'width' => $request->width,
+        'style' => $request->style,
+        'category' => $request->category,
+        'imagen' => $imageName,
+    ]);
+
+    return redirect()->route('galeria')->with('success', 'Obra guardada correctamente');
+}
+
 }

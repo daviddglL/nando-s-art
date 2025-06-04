@@ -18,7 +18,20 @@
                 <ul class="flex space-x-6">
                     <li><a href="{{ route('landing') }}" class="text-gray-700 hover:text-gray-900">Inicio</a></li>
                     <li><a href="{{ route('galeria') }}" class="text-blue-600 font-semibold hover:underline">Galería</a></li>
-                    <li><a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:underline">Iniciar Sesión</a></li>
+                    @guest
+                        <li><a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:underline">Iniciar Sesión</a></li>
+                        <li><a href="{{ route('register') }}" class="btn btn-secondary" style="margin-left: 10px;">Crear cuenta</a></li>
+                    @endguest
+
+                    @auth
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="text-red-600 font-semibold hover:underline">Cerrar sesión</button>
+                            </form>
+                        </li>
+                    @endauth
+
                 </ul>
             </nav>
         </div>
@@ -52,7 +65,7 @@
 
     <!-- Bloque 2 (invertido) -->
     <div class="flex flex-col md:flex-row-reverse items-center md:space-x-8 md:space-x-reverse">
-        <img src="{{ asset('images/zig2.jpg') }}" alt="Obra 2" class="w-full md:w-1/2 rounded-lg shadow-lg mb-4 md:mb-0">
+        <img src="{{ asset('images/zig2.jpeg') }}" alt="Obra 2" class="w-full md:w-1/2 rounded-lg shadow-lg mb-4 md:mb-0">
         <p class="text-gray-700 text-lg leading-relaxed md:w-1/2">
             Una explosión de color y energía. Este estilo a rotulador crea líneas fuertes que exploran el dinamismo del movimiento urbano.
         </p>
@@ -60,7 +73,7 @@
 
     <!-- Bloque 3 -->
     <div class="flex flex-col md:flex-row items-center md:space-x-8">
-        <img src="{{ asset('images/zig3.jpg') }}" alt="Obra 3" class="w-full md:w-1/2 rounded-lg shadow-lg mb-4 md:mb-0">
+        <img src="{{ asset('images/zig3.jpeg') }}" alt="Obra 3" class="w-full md:w-1/2 rounded-lg shadow-lg mb-4 md:mb-0">
         <p class="text-gray-700 text-lg leading-relaxed md:w-1/2">
             Con una técnica más abstracta, esta pieza en óleo juega con la textura y la intuición para transmitir emociones puras e instintivas.
         </p>
@@ -73,9 +86,5 @@
 
 
 </main>
-
-
-
-
 </body>
 </html>
