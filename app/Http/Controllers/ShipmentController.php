@@ -1,41 +1,45 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Shipment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class ShipmentController extends Controller
 {
-    public function index()
+    public function create()
     {
-        return Shipment::all();
+        return view('shipments.create');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'product_id' => 'required|exists:products,id',
-            'status' => 'required',
+        $validated = $request->validate([
+            'description' => 'required',
+            'height' => 'required|numeric',
+            'width' => 'required|numeric',
+            'style' => 'required|string',
+            'category' => 'required|string',
+            'imagen' => 'nullable|image|max:2048',
         ]);
 
-        return Shipment::create($request->all());
-    }
+        $shipment = new Shipment();
+        $shipment->user_id = Auth::id();
+        $shipment->description = $validated['description'];
+        $shipment->height = $validated['height'];
+        $shipment->width = $validated['width'];
+        $shipment->style = $validated['style'];
+        $shipment->category = $validated['category'];
+        $shipment->status = 'pending';
 
-    public function show(Shipment $shipment)
-    {
-        return $shipment;
-    }
+        if ($request->hasFile('imagen')) {
+            $shipment->imagen = $request->file('imagen')->store('shipments', 'public');
+        }
 
-    public function update(Request $request, Shipment $shipment)
-    {
-        $shipment->update($request->all());
-        return $shipment;
-    }
+        $shipment->save();
 
-    public function destroy(Shipment $shipment)
-    {
-        $shipment->delete();
-        return response()->json(['message' => 'Shipment deleted']);
+        return redirect()->route('dashboard')->with('success', 'Pedido enviado correctamente');
     }
 }

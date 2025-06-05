@@ -2,26 +2,30 @@
 
 namespace Database\Seeders;
 
-use App\Models\Product;
+use Illuminate\Database\Seeder;
 use App\Models\Shipment;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ShipmentSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
-        $shipment = new Shipment();
-        $shipment->user_id = User::find(1)->id;
-        $shipment->product_id = Product::find(1)->id;
-        $shipment->tracking_number = '1';
-        $shipment->quantity = 1;
-        $shipment->status = 'pending';
-        $shipment->save();
+        // Asegurarse de que haya al menos un usuario existente
+        $user = User::first() ?? User::factory()->create();
+
+        // Crear 5 pedidos de prueba
+        for ($i = 0; $i < 5; $i++) {
+            Shipment::create([
+                'user_id' => $user->id,
+                'description' => 'Pedido de prueba ' . ($i + 1),
+                'height' => rand(20, 100),
+                'width' => rand(20, 100),
+                'style' => fake()->randomElement(['abstracto', 'realismo', 'impresionismo']),
+                'category' => fake()->randomElement(['paisaje', 'urbano', 'retrato']),
+                'status' => 'pending',
+                'imagen' => null, // Opcional: puedes agregar rutas si quieres
+            ]);
+        }
     }
 }

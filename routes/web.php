@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ShipmentController;
 
 // Ruta de inicio
 Route::get('/', function () {
@@ -46,4 +47,10 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('/admin', [AdminController::class, 'index'])->middleware(['auth', 'admin']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/presupuesto', [ShipmentController::class, 'create'])->name('shipments.create');
+    Route::post('/presupuesto', [ShipmentController::class, 'store'])->name('shipments.store');
+});
+
 

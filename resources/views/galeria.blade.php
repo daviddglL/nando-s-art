@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     card.innerHTML = `
                         <h3 class="text-xl font-bold text-gray-800 mb-2">${producto.name}</h3>
-                        <img src="/storage/${producto.imagen}" alt="${producto.name}" class="w-full h-48 object-cover rounded mb-2"/>
+                        <img src="/storage/obras/${producto.imagen}" alt="${producto.name}" class="w-full h-48 object-cover rounded mb-2"/>
                         <p class="text-gray-600">${producto.description}</p>
                         <p class="text-sm text-gray-500 mt-1">Tamaño: ${producto.height} x ${producto.width}</p>
                         <p class="text-sm text-gray-500">Categoría: ${producto.category}</p>

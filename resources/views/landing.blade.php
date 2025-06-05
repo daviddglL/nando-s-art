@@ -18,6 +18,14 @@
                 <ul class="flex space-x-6">
                     <li><a href="{{ route('landing') }}" class="text-gray-700 hover:text-gray-900">Inicio</a></li>
                     <li><a href="{{ route('galeria') }}" class="text-blue-600 font-semibold hover:underline">Galería</a></li>
+                    @auth
+                        @if (Auth::user()->role === 'user')
+                            <a href="{{ route('shipments.create') }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                Pedir Presupuesto
+                            </a>
+                        @endif
+                    @endauth
+
                     @guest
                         <li><a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:underline">Iniciar Sesión</a></li>
                         <li><a href="{{ route('register') }}" class="btn btn-secondary" style="margin-left: 10px;">Crear cuenta</a></li>
