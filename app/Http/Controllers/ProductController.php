@@ -22,32 +22,27 @@ class ProductController extends Controller
 
 public function store(Request $request)
 {
-    $request->validate([
-        'name' => 'required',
-        'description' => 'required',
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'required|string',
         'height' => 'required|numeric',
         'width' => 'required|numeric',
         'style' => 'required|string',
         'category' => 'required|string',
-        'imagen' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        'imagen' => 'required|image|max:2048',
     ]);
 
-    // Guardar la imagen
-    $imagePath = $request->file('imagen')->store('obras', 'public');
-    $imageName = basename($imagePath);
+    // Guardar la imagen en public/images
+    if ($request->hasFile('imagen')) {
+        $imageName = time() . '_' . $request->file('imagen')->getClientOriginalName();
+        $request->file('imagen')->storeAs('obras', $imageName, 'public');
+        $validated['imagen'] = $imageName;
+    }
 
-    // Crear producto
-    Product::create([
-        'name' => $request->name,
-        'description' => $request->description,
-        'height' => $request->height,
-        'width' => $request->width,
-        'style' => $request->style,
-        'category' => $request->category,
-        'imagen' => $imageName,
-    ]);
+    // Guardar el producto en la base de datos
+    Product::create($validated);
 
-    return redirect()->route('galeria')->with('success', 'Obra guardada correctamente');
+    return redirect()->route('galeria')->with('success', 'Obra creada correctamente');
 }
 
 }

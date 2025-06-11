@@ -1,52 +1,57 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <title>Mi aplicación</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body id="body-app" class="bg-gray-100 min-h-screen">
 
     <!-- NAVBAR -->
-    <nav class="bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <a href="{{ url('/') }}" class="text-xl font-bold text-gray-800">
-                {{ config('app.name', 'Laravel') }}
-            </a>
 
-            <div class="flex items-center space-x-4">
+
+    {{-- Puedes poner esto en layouts.app o al inicio de tu vista index.blade.php --}}
+    <nav class="bg-gradient-to-r from-blue-100 to-pink-100 shadow ">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
+            <h1 class="text-2xl font-bold text-gray-700">
+                <a href="{{ url('/') }}">Nando's Art</a>
+            </h1>
+            <ul class="flex space-x-6 items-center">
+                <li>
+                    <a href="{{ route('landing') }}" class="text-gray-700 hover:text-blue-500 font-medium">Inicio</a>
+                </li>
+                <li>
+                    <a href="{{ route('galeria') }}" class="text-blue-500 font-semibold hover:underline">Galería</a>
+                </li>
                 @guest
-                    @if (Route::has('login'))
-                        <a href="{{ route('login') }}" class="text-gray-600 hover:text-blue-600 font-medium">Login</a>
-                    @endif
-
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="text-gray-600 hover:text-blue-600 font-medium">Register</a>
-                    @endif
-                @else
-                    <div class="relative group">
-                        <button class="text-gray-800 font-semibold focus:outline-none">
-                            {{ Auth::user()->name }}
-                        </button>
-                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden group-hover:block z-10">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                    Cerrar sesión
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    <li>
+                        <a href="{{ route('login') }}" class="text-blue-500 font-semibold hover:underline">Iniciar Sesión</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('register') }}" class="bg-pink-200 text-gray-700 px-3 py-1 rounded hover:bg-pink-300 font-medium transition">Crear cuenta</a>
+                    </li>
                 @endguest
-            </div>
+                @auth
+                    @if(Auth::user()->role === 'admin')
+                        <li>
+                            <a href="{{ route('shipments.index') }}" class="text-blue-500 font-semibold hover:underline">
+                                Ver Shipments
+                            </a>
+                        </li>
+                    @endif
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="text-red-500 font-semibold hover:underline bg-transparent border-none cursor-pointer">Cerrar sesión</button>
+                        </form>
+                    </li>
+                @endauth
+            </ul>
         </div>
     </nav>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="py-8">
+    <main class="">
         @yield('content')
     </main>
-
+    @yield('scripts')
 </body>
 </html>

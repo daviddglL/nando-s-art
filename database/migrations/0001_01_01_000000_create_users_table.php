@@ -17,12 +17,6 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('address')->default('No address provided');
-            $table->string('city')->default('Unknown');
-            $table->string('state')->default('Unknown');
-            $table->string('country')->default('Unknown');
-            $table->string('zip')->default('00000');
-            $table->string('phone')->default('000-000-0000');
             $table->enum('role', ['admin', 'user'])->default('user');            
 
             $table->rememberToken();

@@ -8,6 +8,11 @@
         @csrf
 
         <div>
+            <label class="block text-gray-700 font-semibold mb-1">ID de Usuario</label>
+            <input type="number" name="user_id" required class="w-full px-4 py-2 border border-gray-300 rounded-md" placeholder="Introduce el ID del usuario">
+        </div>
+
+        <div>
             <label class="block text-gray-700 font-semibold mb-1">Descripción</label>
             <textarea name="description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-md"></textarea>
         </div>
@@ -24,27 +29,27 @@
         </div>
 
         <div>
-                <label class="block text-gray-700 font-semibold mb-1">Estilo</label>
-                <select name="style" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="acuarela">Acuarela</option>
-                    <option value="rotulador">Rotulador</option>
-                    <option value="oleo">Óleo</option>
-                    <option value="sketch">Sketch</option>
-                    <option value="papel">Papel</option>
-                    <option value="lienzo">Lienzo</option>
-                </select>
-            </div>
+            <label class="block text-gray-700 font-semibold mb-1">Estilo</label>
+            <select name="style" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="acuarela">Acuarela</option>
+                <option value="rotulador">Rotulador</option>
+                <option value="oleo">Óleo</option>
+                <option value="sketch">Sketch</option>
+                <option value="papel">Papel</option>
+                <option value="lienzo">Lienzo</option>
+            </select>
+        </div>
 
-            <div>
-                <label class="block text-gray-700 font-semibold mb-1">Categoría</label>
-                <select name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="retrato">Retrato</option>
-                    <option value="paisaje">Paisaje</option>
-                    <option value="abstracto">Abstracto</option>
-                    <option value="urbano">Urbano</option>
-                    <option value="otro">Otro</option>
-                </select>
-            </div>
+        <div>
+            <label class="block text-gray-700 font-semibold mb-1">Categoría</label>
+            <select name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="retrato">Retrato</option>
+                <option value="paisaje">Paisaje</option>
+                <option value="abstracto">Abstracto</option>
+                <option value="urbano">Urbano</option>
+                <option value="otro">Otro</option>
+            </select>
+        </div>
 
         <div>
             <label class="block text-gray-700 font-semibold mb-1">Imagen (opcional)</label>

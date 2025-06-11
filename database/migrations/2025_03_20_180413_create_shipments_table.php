@@ -13,7 +13,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->decimal('height', 8, 2);
             $table->decimal('width', 8, 2);
             $table->string('style');

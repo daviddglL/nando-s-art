@@ -9,7 +9,15 @@ class Shipment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'product_id', 'status'];
+    protected $fillable = [
+        'user_id',
+        'description',
+        'height',
+        'width',
+        'style',
+        'category',
+        'status'
+    ];
 
     public function user()
     {

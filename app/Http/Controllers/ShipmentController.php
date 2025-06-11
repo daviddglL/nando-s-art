@@ -6,9 +6,16 @@ use App\Models\Shipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
 class ShipmentController extends Controller
 {
+    public function index()
+    {
+        // Puedes ajustar la consulta según permisos o filtros
+        $shipments = Shipment::all();
+        $users = \App\Models\User::all();
+        return view('shipments.index', compact('shipments', 'users'));
+    }
+
     public function create()
     {
         return view('shipments.create');
@@ -16,30 +23,35 @@ class ShipmentController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'description' => 'required',
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'description' => 'required|string',
             'height' => 'required|numeric',
             'width' => 'required|numeric',
             'style' => 'required|string',
             'category' => 'required|string',
-            'imagen' => 'nullable|image|max:2048',
+            // ...otros campos si los hay...
         ]);
 
-        $shipment = new Shipment();
-        $shipment->user_id = Auth::id();
-        $shipment->description = $validated['description'];
-        $shipment->height = $validated['height'];
-        $shipment->width = $validated['width'];
-        $shipment->style = $validated['style'];
-        $shipment->category = $validated['category'];
-        $shipment->status = 'pending';
+        Shipment::create([
+            'user_id' => $request->user_id,
+            'description' => $request->description,
+            'height' => $request->height,
+            'width' => $request->width,
+            'style' => $request->style,
+            'category' => $request->category,
+            'status' => 'pending',
+            // ...otros campos si los hay...
+        ]);
 
-        if ($request->hasFile('imagen')) {
-            $shipment->imagen = $request->file('imagen')->store('shipments', 'public');
-        }
+        return redirect()->route('shipments.index')->with('success', 'Shipment creado correctamente');
+    }
 
-        $shipment->save();
+    public function destroy($id)
+    {
+        $shipment = Shipment::findOrFail($id);
+        $shipment->delete();
 
-        return redirect()->route('dashboard')->with('success', 'Pedido enviado correctamente');
+        return redirect()->route('shipments.index')->with('success', 'Shipment eliminado correctamente');
     }
 }

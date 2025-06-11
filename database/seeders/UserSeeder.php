@@ -17,17 +17,21 @@ class UserSeeder extends Seeder
     {
         //
         DB::table('users')->insert([
-            'name' => 'admin',
-            'email' => 'admin@exmaple.com',
-            'password' => bcrypt('admin'),
-            'address' => '123 Main St',
-            'city' => 'Springfield',
-            'state' => 'IL',
-            'country' => 'USA',
-            'zip' => '62701',
-            'phone' => '217-555-1212',  
-            'role' => 'admin',
-            'remember_token' => Str ::random(10),
+            [
+                'name' => 'admin',
+                'email' => 'admin@example.com',
+                'password' => bcrypt('admin'),
+                'role' => 'admin',
+                'remember_token' => Str::random(10),
+            ],
+            [
+                'name' => 'nando',
+                'email' => 'info@fernandodelgadoart.com',
+                'password' => bcrypt('75139211'),
+                'role' => 'admin',
+                'remember_token' => Str::random(10),
+            ],
+
         ]);
     }
 }

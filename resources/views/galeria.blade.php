@@ -4,56 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galería</title>
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
 
-<!-- Header -->
-<header class="bg-white shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
-        <h1 class="text-2xl font-bold text-gray-800">
-            <a href="{{ url('/') }}">Mi Aplicación</a>
-        </h1>
-        <nav>
-            <ul class="flex space-x-6">
-                <li><a href="{{ route('landing') }}" class="text-gray-700 hover:text-gray-900">Inicio</a></li>
-                <li><a href="{{ route('galeria') }}" class="text-gray-700 hover:text-gray-900 font-semibold">Galería</a></li>
-                @guest
-                    <li><a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:underline">Iniciar Sesión</a></li>
-                    <li><a href="{{ route('register') }}" class="text-blue-600 font-semibold hover:underline ml-4">Crear cuenta</a></li>
-                @endguest
 
-                @auth
-                    <li>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="text-red-600 font-semibold hover:underline">Cerrar sesión</button>
-                        </form>
-                    </li>
-                @endauth
-            </ul>
-        </nav>
-    </div>
-</header>
 
-<!-- Contenido principal -->
-<main class="flex flex-col items-center min-h-screen">
+{{-- filepath: c:\Users\ragna\OneDrive\Escritorio\nando-s-art\resources\views\galeria.blade.php --}}
+@extends('layouts.app')
+@section('content')
+<main id="galeria-main" class="flex flex-col items-center min-h-screen bg-gray-100 transition-colors duration-500">
     <h2 class="text-3xl font-bold text-gray-800 pt-12 mb-4">Muestras</h2>
 
     <!-- Estilos -->
+    @php
+        $colores = [
+            'acuarela' => 'bg-blue-100 text-blue-900 hover:bg-blue-200',
+            'rotulador' => 'bg-yellow-100 text-yellow-900 hover:bg-yellow-200',
+            'oleo' => 'bg-pink-100 text-pink-900 hover:bg-pink-200',
+            'sketch' => 'bg-gray-100 text-gray-900 hover:bg-gray-200',
+            'papel' => 'bg-green-100 text-green-900 hover:bg-green-200',
+            'lienzo' => 'bg-purple-100 text-purple-900 hover:bg-purple-200',
+        ];
+    @endphp
+
     <div class="flex space-x-2 mb-4">
-        @foreach(['Acuarela', 'Rotulador', 'Óleo', 'Sketch', 'Papel', 'Lienzo'] as $index => $style)
+        @foreach(['acuarela', 'rotulador', 'oleo', 'sketch', 'papel', 'lienzo'] as $style)
             <button 
-                class="px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded hover:bg-gray-400 filtro-estilo"
-                data-style="{{ strtolower($style) }}"
+                class="px-4 py-2 font-semibold rounded filtro-estilo bg-gray-200 text-gray-800"
+                data-style="{{ $style }}"
+                data-color="{{ $colores[$style] }}"
             >
-                {{ $style }}
+                {{ ucfirst($style) }}
             </button>
         @endforeach
     </div>
 
     <!-- Carrusel -->
-    <div class="relative w-[1150px] border-2 border-gray-300 bg-white rounded-xl shadow-md px-4 py-6 overflow-hidden">
+    <div class="relative w-[1150px] rounded-xl px-4 py-6 overflow-hidden">
 
         <div id="contenedor-muestras" class="flex transition-transform duration-300 ease-in-out space-x-4">
             <!-- Tarjetas dinámicas aquí -->
@@ -75,6 +62,9 @@
         </a>
     @endif
 </main>
+@endsection
+
+@yield('scripts')
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -82,58 +72,126 @@ document.addEventListener("DOMContentLoaded", () => {
     const contenedor = document.getElementById("contenedor-muestras");
     const btnNext = document.getElementById("next");
     const btnPrev = document.getElementById("prev");
+    const main = document.getElementById("galeria-main");
 
+    // Relación estilo -> clase de fondo Tailwind
+    const fondos = {
+        acuarela: "bg-blue-100",
+        rotulador: "bg-yellow-100",
+        oleo: "bg-pink-100",
+        sketch: "bg-gray-100",
+        papel: "bg-green-100",
+        lienzo: "bg-purple-100"
+    };
+
+    // Relación estilo -> clases de botón
+    const coloresBtn = {
+        acuarela: "bg-blue-100 text-blue-900 hover:bg-blue-200",
+        rotulador: "bg-yellow-100 text-yellow-900 hover:bg-yellow-200",
+        oleo: "bg-pink-100 text-pink-900 hover:bg-pink-200",
+        sketch: "bg-gray-100 text-gray-900 hover:bg-gray-200",
+        papel: "bg-green-100 text-green-900 hover:bg-green-200",
+        lienzo: "bg-purple-100 text-purple-900 hover:bg-purple-200"
+    };
+
+    let productos = [];
     let currentIndex = 0;
 
+    const cardWidth = 424; // 400px + mx-2 (2*12px)
+    const visible = 5; // Cuántas tarjetas mostrar (debe ser impar)
+    const half = Math.floor(visible / 2);
+
+    function seleccionarBoton(estilo) {
+        botones.forEach(boton => {
+            // Quita el color a todos
+            boton.className = "px-4 py-2 font-semibold rounded filtro-estilo bg-gray-200 text-gray-800";
+            // Si es el seleccionado, ponle su color pastel
+            if (boton.dataset.style === estilo) {
+                boton.className += " " + coloresBtn[estilo];
+            }
+        });
+    }
+
     const cargarEstilo = (estilo) => {
+        // Cambia el fondo
+        main.className = "flex flex-col items-center min-h-screen transition-colors duration-500 " + (fondos[estilo] || "bg-gray-100");
+        // Marca el botón seleccionado
+        seleccionarBoton(estilo);
+
         fetch(`/api/products?style=${estilo}`)
             .then(response => response.json())
             .then(data => {
-                contenedor.innerHTML = "";
-
-                if (data.length === 0) {
-                    contenedor.innerHTML = "<p class='text-gray-500'>No hay productos para este estilo.</p>";
-                    return;
-                }
-
-                data.forEach(producto => {
-                    console.log(producto);
-                    const card = document.createElement("div");
-                    card.className = "min-w-[360px] max-w-[360px] h-[500px] bg-white p-6 rounded-2xl shadow-lg border border-gray-300 flex-shrink-0 flex flex-col justify-between";
-
-                    card.innerHTML = `
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${producto.name}</h3>
-                        <img src="/storage/obras/${producto.imagen}" alt="${producto.name}" class="w-full h-48 object-cover rounded mb-2"/>
-                        <p class="text-gray-600">${producto.description}</p>
-                        <p class="text-sm text-gray-500 mt-1">Tamaño: ${producto.height} x ${producto.width}</p>
-                        <p class="text-sm text-gray-500">Categoría: ${producto.category}</p>
-                    `;
-                    contenedor.appendChild(card);
-                });
-                currentIndex = 0;
-                updateCarousel();
+                productos = data;
+                currentIndex = Math.floor(productos.length / 2); // Empieza centrado
+                renderCarrusel(productos, currentIndex);
             });
     };
 
-    const updateCarousel = () => {
-        const offset = currentIndex * 380; // nuevo ancho con margen
+    const renderCarrusel = (data, indexCentral) => {
+        contenedor.innerHTML = "";
+        const total = data.length;
+        const visible = Math.min(5, total); // máximo 5 visibles
+        const half = Math.floor(visible / 2);
 
-        contenedor.style.transform = `translateX(-${offset}px)`;
+        // Espaciador izquierdo
+        const spacerLeft = document.createElement("div");
+        spacerLeft.className = "flex-shrink-0";
+        spacerLeft.style.width = `${cardWidth}px`;
+        contenedor.appendChild(spacerLeft);
+
+        // Calcula los índices de los productos a mostrar (en bucle)
+        let indices = [];
+        for (let i = -half; i <= half; i++) {
+            let idx = (indexCentral + i + total) % total;
+            indices.push(idx);
+        }
+
+        indices.forEach((idx, pos) => {
+            const producto = data[idx];
+            let extraClasses = "";
+            if (pos === half) {
+                extraClasses = "scale-110 z-20 shadow-2xl";
+            } else if (pos === half - 1 || pos === half + 1) {
+                extraClasses = "scale-95 blur-[1px] z-10";
+            } else {
+                extraClasses = "scale-90 blur-[2px] opacity-60 z-0";
+            }
+
+            const card = document.createElement("div");
+            card.className = `min-w-[400px] max-w-[400px] h-[520px] bg-white p-6 rounded-2xl border border-gray-300 flex-shrink-0 flex flex-col justify-between mx-2 transition-all duration-500 ease-in-out ${extraClasses}`;
+            card.innerHTML = `
+                <h3 class="text-xl font-bold text-gray-800 mb-2">${producto.name}</h3>
+                <img src="/storage/obras/${producto.imagen}" alt="${producto.name}" class="w-full h-48 object-cover rounded mb-2"/>
+                <p class="text-gray-600">${producto.description}</p>
+                <p class="text-sm text-gray-500 mt-1">Tamaño: ${producto.height} x ${producto.width}</p>
+                <p class="text-sm text-gray-500">Categoría: ${producto.category}</p>
+            `;
+            contenedor.appendChild(card);
+        });
+
+        // Espaciador derecho
+        const spacerRight = document.createElement("div");
+        spacerRight.className = "flex-shrink-0";
+        spacerRight.style.width = `${cardWidth}px`;
+        contenedor.appendChild(spacerRight);
+
+        // Centra el carrusel visualmente
+        const offset = cardWidth * (half + 1.5); // +1 por el espaciador izquierdo
+        contenedor.style.transition = "transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)";
+        contenedor.style.transform = `translateX(calc(50% - ${offset}px))`;
     };
 
+    // Bucle infinito en las flechas
     btnNext.addEventListener("click", () => {
-        const max = contenedor.children.length - 3;
-        if (currentIndex < max) {
-            currentIndex++;
-            updateCarousel();
-        }
+        if (productos.length === 0) return;
+        currentIndex = (currentIndex + 1) % productos.length;
+        renderCarrusel(productos, currentIndex);
     });
 
     btnPrev.addEventListener("click", () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            updateCarousel();
-        }
+        if (productos.length === 0) return;
+        currentIndex = (currentIndex - 1 + productos.length) % productos.length;
+        renderCarrusel(productos, currentIndex);
     });
 
     // Carga inicial
@@ -146,6 +204,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 </script>
-
 </body>
 </html>
