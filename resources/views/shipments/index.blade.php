@@ -17,10 +17,6 @@
                                 <th class="py-2 px-2">ID</th>
                                 <th class="py-2 px-2">Nombre</th>
                                 <th class="py-2 px-2">Email</th>
-                                <th class="py-2 px-2">Dirección</th>
-                                <th class="py-2 px-2">Ciudad</th>
-                                <th class="py-2 px-2">País</th>
-                                <th class="py-2 px-2">ZIP</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -29,10 +25,6 @@
                                     <td class="py-1 px-2">{{ $user->id }}</td>
                                     <td class="py-1 px-2">{{ $user->name }}</td>
                                     <td class="py-1 px-2">{{ $user->email }}</td>
-                                    <td class="py-1 px-2">{{ $user->address }}</td>
-                                    <td class="py-1 px-2">{{ $user->city }}</td>
-                                    <td class="py-1 px-2">{{ $user->country }}</td>
-                                    <td class="py-1 px-2">{{ $user->zip }}</td>
                                 </tr>
                             @empty
                                 <tr>
