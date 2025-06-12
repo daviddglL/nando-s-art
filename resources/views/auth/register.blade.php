@@ -39,53 +39,7 @@
                     class="mt-1 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
 
-            <!-- Dirección -->
-            <div class="col-span-1">
-                <label for="address" class="block text-sm font-semibold text-gray-700">Dirección</label>
-                <input id="address" type="text" name="address" value="{{ old('address') }}"
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('address') border-red-500 @enderror">
-                @error('address') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <!-- Ciudad -->
-            <div class="col-span-1">
-                <label for="city" class="block text-sm font-semibold text-gray-700">Ciudad</label>
-                <input id="city" type="text" name="city" value="{{ old('city') }}"
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('city') border-red-500 @enderror">
-                @error('city') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <!-- Estado -->
-            <div class="col-span-1">
-                <label for="state" class="block text-sm font-semibold text-gray-700">Provincia/Estado</label>
-                <input id="state" type="text" name="state" value="{{ old('state') }}"
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('state') border-red-500 @enderror">
-                @error('state') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <!-- País -->
-            <div class="col-span-1">
-                <label for="country" class="block text-sm font-semibold text-gray-700">País</label>
-                <input id="country" type="text" name="country" value="{{ old('country') }}"
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('country') border-red-500 @enderror">
-                @error('country') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <!-- Código postal -->
-            <div class="col-span-1">
-                <label for="zip" class="block text-sm font-semibold text-gray-700">Código postal</label>
-                <input id="zip" type="text" name="zip" value="{{ old('zip') }}"
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('zip') border-red-500 @enderror">
-                @error('zip') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <!-- Teléfono -->
-            <div class="col-span-1">
-                <label for="phone" class="block text-sm font-semibold text-gray-700">Teléfono</label>
-                <input id="phone" type="text" name="phone" value="{{ old('phone') }}"
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 @error('phone') border-red-500 @enderror">
-                @error('phone') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-            </div>
+        
 
             <!-- Botón de registro -->
             <div class="col-span-2">
