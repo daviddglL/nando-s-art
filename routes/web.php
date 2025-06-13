@@ -30,7 +30,7 @@ Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria');
 // Rutas solo para admin (añadir productos)
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/galeria/nuevo', [ProductController::class, 'create'])->name('products.create');
-Route::post('/api/products', [ProductController::class, 'store'])->name('api.products.store');
+Route::post('/api/products', [ProductController::class, 'store'])->name('products.store');
 });
 
 // Ruta para obtener frase del día (proxy para evitar CORS)

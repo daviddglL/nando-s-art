@@ -32,17 +32,27 @@ public function store(Request $request)
         'imagen' => 'required|image|max:2048',
     ]);
 
-    // Guardar la imagen en public/images
     if ($request->hasFile('imagen')) {
-        $imageName = time() . '_' . $request->file('imagen')->getClientOriginalName();
-        $request->file('imagen')->storeAs('obras', $imageName, 'public');
-        $validated['imagen'] = $imageName;
+        $file = $request->file('imagen');
+        $nombreImagen = $file->getClientOriginalName();
+
+        // Ruta absoluta donde guardar la imagen:
+        $rutaFisica = public_path('storage/obras/' . $nombreImagen);
+
+        if (file_exists($rutaFisica)) {
+            // Si ya existe, solo guardamos la ruta relativa
+            $validated['imagen'] =  $nombreImagen;
+        } else {
+            // Movemos el archivo a la ruta física deseada
+            $file->move(public_path('storage/obras'), $nombreImagen);
+            $validated['imagen'] =  $nombreImagen;
+        }
     }
 
-    // Guardar el producto en la base de datos
     Product::create($validated);
 
     return redirect()->route('galeria')->with('success', 'Obra creada correctamente');
 }
+
 
 }
