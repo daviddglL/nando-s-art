@@ -170,6 +170,8 @@ return [
         'category' => 'categoría',
         'imagen' => 'imagen',
         'image' => 'imagen',
+        'imagenes' => 'imágenes',
+        'imagenes.*' => 'imagen',
         'role' => 'rol',
     ],
 ];

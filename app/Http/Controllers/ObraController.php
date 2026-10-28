@@ -9,6 +9,8 @@ class ObraController extends Controller
 {
     public function show(Product $obra)
     {
+        $obra->load('imagenes');
+
         // Otras obras del mismo estilo para seguir navegando
         $relacionadas = Product::query()
             ->where('style', $obra->style)

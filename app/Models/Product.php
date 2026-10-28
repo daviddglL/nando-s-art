@@ -4,20 +4,21 @@ namespace App\Models;
 
 use App\Enums\Category;
 use App\Enums\Style;
+use App\Models\Concerns\TieneImagen;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
-    use HasFactory, Prunable, SoftDeletes;
+    use HasFactory, Prunable, SoftDeletes, TieneImagen;
 
     // Clave de caché que cambia cada vez que se toca una obra: así la API nunca sirve datos viejos
     public const VERSION_CACHE = 'obras.version';
@@ -68,13 +69,11 @@ class Product extends Model
         static::deleted($invalidar);
         static::restored($invalidar);
 
-        // Al borrar definitivamente (desde la papelera o al purgarla) se borran también la imagen y sus miniaturas
-        static::forceDeleted(function (Product $obra) {
-            if ($obra->imagen) {
-                Storage::disk('public')->delete('obras/'.$obra->imagen);
-                $obra->borrarMiniaturas();
-            }
+        // Al borrar definitivamente (desde la papelera o al purgarla) se borran también las imágenes y sus miniaturas
+        static::forceDeleting(function (Product $obra) {
+            $obra->imagenes()->get()->each->delete();
         });
+        static::forceDeleted(fn (Product $obra) => $obra->borrarImagen());
     }
 
     /**
@@ -120,59 +119,14 @@ class Product extends Model
         $query->where('featured', true)->ordenadas();
     }
 
-    public function imagenUrl(): string
-    {
-        return asset('storage/obras/'.rawurlencode((string) $this->imagen));
-    }
-
-    // Las miniaturas WebP de cada imagen (App\Actions\GenerarMiniaturas) van en su propia carpeta
-    public function carpetaMiniaturas(): string
-    {
-        return 'obras/miniaturas/'.pathinfo((string) $this->imagen, PATHINFO_FILENAME);
-    }
-
     /**
-     * Anchos de las miniaturas que existen, de menor a mayor.
+     * Imágenes adicionales de la obra (la principal sigue en `imagen`), en el orden que fija el admin.
      *
-     * @return list<int>
+     * @return HasMany<ObraImagen, $this>
      */
-    public function anchosMiniaturas(): array
+    public function imagenes(): HasMany
     {
-        if (! $this->imagen) {
-            return [];
-        }
-
-        $anchos = array_map(
-            fn (string $fichero) => (int) pathinfo($fichero, PATHINFO_FILENAME),
-            Storage::disk('public')->files($this->carpetaMiniaturas()),
-        );
-        sort($anchos);
-
-        return array_values(array_filter($anchos));
-    }
-
-    // Valor del atributo srcset ("…/400.webp 400w, …/800.webp 800w"); null si la obra no tiene miniaturas
-    public function srcset(): ?string
-    {
-        $carpeta = asset('storage/'.$this->carpetaMiniaturas());
-        $srcset = array_map(fn (int $ancho) => "{$carpeta}/{$ancho}.webp {$ancho}w", $this->anchosMiniaturas());
-
-        return $srcset ? implode(', ', $srcset) : null;
-    }
-
-    // La miniatura más pequeña (para listados); si no hay, la imagen original
-    public function miniaturaUrl(): string
-    {
-        $ancho = $this->anchosMiniaturas()[0] ?? null;
-
-        return $ancho ? asset('storage/'.$this->carpetaMiniaturas()."/{$ancho}.webp") : $this->imagenUrl();
-    }
-
-    public function borrarMiniaturas(): void
-    {
-        if ($this->imagen) {
-            Storage::disk('public')->deleteDirectory($this->carpetaMiniaturas());
-        }
+        return $this->hasMany(ObraImagen::class)->orderBy('sort_order')->orderBy('id');
     }
 
     public function precioTexto(): string

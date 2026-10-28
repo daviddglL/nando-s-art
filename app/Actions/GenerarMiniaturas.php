@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Models\ObraImagen;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,12 +12,12 @@ class GenerarMiniaturas
     public const ANCHOS = [400, 800, 1600];
 
     /**
-     * Crea las versiones WebP de la imagen de una obra en storage/app/public/obras/miniaturas/{nombre}/{ancho}.webp.
+     * Crea las versiones WebP de la imagen de una obra (la principal o una adicional) en storage/app/public/obras/miniaturas/{nombre}/{ancho}.webp.
      * Devuelve los anchos generados (vacío si no hay imagen o el servidor no tiene GD con WebP).
      *
      * @return list<int>
      */
-    public function handle(Product $obra): array
+    public function handle(Product|ObraImagen $obra): array
     {
         $disco = Storage::disk('public');
         $ruta = 'obras/'.$obra->imagen;

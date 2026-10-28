@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Actions\GenerarMiniaturas;
+use App\Models\ObraImagen;
 use App\Models\Product;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -12,7 +13,7 @@ class GenerarMiniaturasObras extends Command
 {
     protected $signature = 'obras:miniaturas';
 
-    protected $description = 'Genera (o vuelve a generar) las miniaturas WebP de todas las obras';
+    protected $description = 'Genera (o vuelve a generar) las miniaturas WebP de todas las obras y sus imágenes adicionales';
 
     public function handle(GenerarMiniaturas $miniaturas): int
     {
@@ -27,6 +28,14 @@ class GenerarMiniaturasObras extends Command
             $anchos
                 ? $this->line("{$obra->name}: ".implode(', ', $anchos).' px')
                 : $this->warn("{$obra->name}: no se encuentra la imagen {$obra->imagen}");
+        });
+
+        ObraImagen::with('obra')->each(function (ObraImagen $imagen) use ($miniaturas) {
+            $nombre = "{$imagen->obra->name} (imagen adicional {$imagen->imagen})";
+            $anchos = $miniaturas->handle($imagen);
+            $anchos
+                ? $this->line("{$nombre}: ".implode(', ', $anchos).' px')
+                : $this->warn("{$nombre}: no se encuentra el fichero");
         });
 
         // La API guarda en caché las URLs de las imágenes: se renueva para que salgan las miniaturas
