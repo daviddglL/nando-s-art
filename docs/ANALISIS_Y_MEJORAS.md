@@ -2,6 +2,8 @@
 
 Fecha del análisis: 28/10/2026. Rama analizada: `master` (último commit `ec3c06f`).
 
+La sección 11 registra la evolución del proyecto respecto a este análisis.
+
 Este documento recoge qué conviene **arreglar**, **actualizar**, **mejorar** y qué **funcionalidades faltan**. Está ordenado por prioridad dentro de cada sección. Las referencias a ficheros usan la forma `ruta:línea`.
 
 ---
@@ -255,3 +257,60 @@ Propuesta:
 2. **Fase 2, limpieza (1–2 días)**: quitar laravel/ui o Breeze (dejar uno), quitar Bootstrap/Sass/CDN y dejar Tailwind 4 con Vite, borrar Kernel y providers muertos, enums, Pint, actualizar dependencias.
 3. **Fase 3, MVI y tests (2–4 días)**: galería en módulos MVI con reducer testeado, FormRequests/Actions/Resources/Policies en backend, tests Pest y CI.
 4. **Fase 4, funcionalidades**: CRUD admin, detalle de obra, gestión de encargos con emails, panel del cliente, SEO y responsive.
+
+---
+
+## 11. Evolución del proyecto
+
+Esta sección se actualiza cada vez que se cierra un bloque de tareas, comparando el estado de `master` con lo que pedía este informe.
+
+Leyenda: ✅ hecho · 🟡 a medias · ❌ pendiente.
+
+### Revisión 1 (28/10/2026), tras la fase 1: PRs #2, #3 y #4
+
+**Resumen:** la web ya no se rompe en los flujos principales (galería, presupuesto, dashboard y panel de admin) y se han cerrado los dos agujeros de seguridad más graves. La fase 1 está hecha en un 80 % aproximadamente. Las fases 2, 3 y 4 no se han empezado.
+
+#### Qué se ha resuelto
+
+| Punto del informe | Estado | Cómo se resolvió |
+|---|---|---|
+| 1.1 Rutas inexistentes (`shipments.index`, `.store`, `.destroy`) | ✅ | Rutas nuevas en `routes/web.php`: `/presupuesto` (auth) y `/admin/shipments` (auth + admin). El redirect de `store` va a `dashboard` o a `shipments.index` según el rol (#4). |
+| 1.2 `User::shipments()` y `HasFactory` | ✅ | Añadidos en `app/Models/User.php` (#4). |
+| 1.3 `routes/api.php` no se cargaba | ✅ | `api:` registrado en `bootstrap/app.php`; `ProductController::index` filtra por `?style=`. El carrusel ya recibe obras (#4). |
+| 2.1 Contraseña real en `UserSeeder` | 🟡 | Se lee de `.env` (`ADMIN_PASSWORD` mediante `config/admin.php`); si no existe, se genera una aleatoria. El usuario `admin/admin` solo se crea en local (#2). **Falta:** cambiar la contraseña antigua, que sigue en el historial de Git. |
+| 2.2 API abierta | 🟡 | `users` exige sesión (`web` + `auth`) y `UserPolicy` controla ver, editar, cambiar el rol y borrar. `products` es solo lectura. `shipments` ya no está en la API (#3, #4). **Falta:** `POST /api/upload-image` sigue sin login y acepta SVG, y `/api/test` sigue expuesta. |
+| 2.3 `role` en `$fillable` | 🟡 | El controlador ya no usa `$request->all()` y asigna el rol aparte, pero `role` sigue en `$fillable` de `User`. |
+| 2.4 `user_id` escrito a mano en el presupuesto | ✅ | Se toma de `$request->user()` y se ha quitado el campo del formulario (#4). |
+| 2.4 Imagen del presupuesto ignorada | ✅ | Se guarda en `storage/app/public/presupuestos` con nombre aleatorio (#4). |
+| 6 Dashboard con texto de plantilla | ✅ | Ahora es "Mis presupuestos" y lista los encargos del usuario con su estado (#4). |
+| 6 Mensajes `success` y errores de validación | 🟡 | Se muestran en el dashboard y en el formulario de presupuesto. Faltan en la galería y en el formulario de obra. |
+| 7 Tests | 🟡 | Hay 13 tests nuevos en `tests/Feature/PaginasRotasTest.php` y `UserApiTest.php` (rutas, permisos, API y carrusel). Los tests heredados de Breeze/Volt (`tests/Feature/Auth`, `ProfileTest`) siguen fallando. |
+
+#### Cómo ha evolucionado la web
+
+- **Antes:** un admin logueado veía un error 500 en todas las páginas, `/dashboard` fallaba, el formulario de presupuesto no enviaba, el carrusel salía vacío y cualquiera podía hacerse admin a través de la API.
+- **Ahora:** un visitante ve la galería con obras filtradas por estilo. Un cliente puede pedir un presupuesto con imagen y seguir su estado en "Mis presupuestos". El admin ve y borra presupuestos, y la API de usuarios respeta los permisos.
+
+#### Qué falta (por prioridad)
+
+**Fase 1, lo que queda:**
+1. 🔴 Cambiar la contraseña antigua del usuario `nando` en cualquier sitio donde se use (sigue en el historial de Git).
+2. 🔴 Proteger `POST /api/upload-image` (auth + admin) y quitar `svg` de los tipos permitidos. Borrar `/api/test`.
+3. 🟠 `ProductController::store` sigue guardando la imagen con el nombre original en `public/storage/obras`; cambiar a `store('obras', 'public')`.
+4. 🟠 XSS en `innerHTML` (galería y `frase.js`) sin tocar.
+5. 🟡 Quitar `role` de `$fillable`.
+6. 🟡 Caché y timeout en `/frase-proxy`; `throttle` en `POST /presupuesto`.
+7. 🟡 Actualizar el comentario de `tests/Feature/UserApiTest.php` que dice que `api.php` "todavía no se registra" (ya se registra).
+
+**Sin cambios desde el análisis (fases 2 a 4):**
+- `galeria.blade.php` con HTML duplicado y script fuera del layout; layout sin `meta viewport`, `charset` ni `title` (punto 1.5 y 1.6).
+- Kernel y providers muertos, `HomeController` con `$this->middleware()` (1.4, 2.9).
+- Datos inconsistentes entre seeders, vistas y JS; `SoftDeletes` sin usar; `Shipment::product()` sin columna (1.7).
+- Mezcla de laravel/ui + Breeze/Volt y de Tailwind CDN + Tailwind 3/4 + Bootstrap; dependencias sin actualizar (punto 3).
+- Arquitectura MVI: todavía no hay intents, reducer ni vista separados (punto 4).
+- Rendimiento, responsive, accesibilidad y SEO (puntos 5 y 6).
+- CI: no compila assets ni ejecuta Pint (punto 7).
+- Funcionalidades nuevas: CRUD completo de obras, detalle de obra, cambio de estado de presupuestos, emails… (punto 8).
+- README (punto 9).
+
+**Siguiente paso recomendado:** cerrar los puntos 1 y 2 de la lista anterior (seguridad), y después empezar la fase 2 (limpieza de dependencias y CSS), que es la base para hacer el MVI.
