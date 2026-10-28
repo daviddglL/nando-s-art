@@ -8,9 +8,17 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Product::all();
+        // El carrusel de la galería pide /api/products?style=acuarela
+        return Product::query()
+            ->when($request->query('style'), fn ($query, $style) => $query->where('style', $style))
+            ->get();
+    }
+
+    public function show(Product $product)
+    {
+        return $product;
     }
     public function create()
 {
