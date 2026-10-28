@@ -48,17 +48,20 @@ Route::get('/frase-proxy', function () {
         : response()->json(['message' => 'No se pudo cargar la frase del día'], 503);
 })->middleware('throttle:60,1');
 
-// Autenticación (laravel/ui): login, registro, recuperar y confirmar contraseña
-Auth::routes();
+// Autenticación (laravel/ui): login, registro (con verificación de email), recuperar y confirmar contraseña
+Auth::routes(['verify' => true]);
 
-// Usuarios con sesión iniciada
+// Usuarios con sesión iniciada (el perfil no pide el email verificado, para poder corregirlo)
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Presupuestos: solo con el email verificado, para que nadie mande peticiones en bucle con cuentas falsas
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/presupuesto', [EncargoController::class, 'create'])->name('encargos.create');
     Route::post('/presupuesto', [EncargoController::class, 'store'])

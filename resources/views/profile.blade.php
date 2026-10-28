@@ -86,7 +86,7 @@
         <p class="text-sm text-gray-600 mb-4">Se borrarán tu cuenta y tus presupuestos. No se puede deshacer.</p>
 
         <form method="POST" action="{{ route('profile.destroy') }}" class="space-y-4"
-            onsubmit="return confirm('¿Seguro que quieres borrar tu cuenta?')">
+            data-confirmar="¿Seguro que quieres borrar tu cuenta?">
             @csrf
             @method('DELETE')
 

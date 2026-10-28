@@ -62,7 +62,7 @@
                             <a href="{{ route('encargos.show', $encargo) }}"
                                class="inline-block bg-blue-100 text-gray-700 px-3 py-1 rounded-sm hover:bg-blue-200">Responder</a>
                             <form action="{{ route('encargos.destroy', $encargo->id) }}" method="POST" class="inline"
-                                  onsubmit="return confirm('¿Seguro que quieres eliminar este presupuesto?')">
+                                  data-confirmar="¿Seguro que quieres eliminar este presupuesto?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-pink-100 text-gray-700 px-3 py-1 rounded-sm hover:bg-pink-200">

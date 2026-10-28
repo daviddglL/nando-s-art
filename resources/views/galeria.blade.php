@@ -1,8 +1,12 @@
 @extends('layouts.app')
 @use('App\Enums\Style')
+@section('title', "Galería de obras · Nando's Art")
+@section('description', 'Galería de Nando\'s Art: obras originales en acuarela, óleo, rotulador y más, ordenadas por estilo. Entra en cada una para ver la ficha y el precio.')
+
 @section('content')
-<main id="galeria-main" class="flex flex-col items-center min-h-screen bg-gray-100 transition-colors duration-500 px-4">
-    <h2 class="text-3xl font-bold text-gray-800 pt-12 mb-4">Muestras</h2>
+{{-- <section> y no <main>: el <main> ya lo pone el layout --}}
+<section id="galeria-main" aria-labelledby="titulo-galeria" class="flex flex-col items-center min-h-screen bg-gray-100 transition-colors duration-500 px-4">
+    <h1 id="titulo-galeria" class="text-3xl font-bold text-gray-800 pt-12 mb-4">Galería</h1>
 
     <!-- Estilos -->
     <div class="flex flex-wrap justify-center gap-2 mb-4" role="group" aria-label="Filtrar por estilo">
@@ -40,7 +44,7 @@
            Añadir Nueva Obra
         </a>
     @endif
-</main>
+</section>
 <x-footer />
 @endsection
 

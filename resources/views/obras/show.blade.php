@@ -11,7 +11,8 @@
     <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
         {{-- Al pulsar la imagen se abre a pantalla completa (resources/js/lightbox.js) --}}
         <button type="button" data-lightbox-abrir="visor-obra" class="block w-full cursor-zoom-in" aria-label="Ampliar la imagen de {{ $obra->name }}">
-            <img src="{{ $obra->imagenUrl() }}" alt="{{ $obra->name }}" class="w-full max-h-[80vh] object-contain rounded-xl shadow-lg bg-white">
+            <img src="{{ $obra->imagenUrl() }}" @if ($obra->srcset()) srcset="{{ $obra->srcset() }}" sizes="(min-width: 1152px) 544px, (min-width: 1024px) 46vw, 92vw" @endif
+                 alt="{{ $obra->name }}" class="w-full max-h-[80vh] object-contain rounded-xl shadow-lg bg-white">
         </button>
 
         <div>
@@ -55,7 +56,7 @@
                 @foreach ($relacionadas as $otra)
                     <li>
                         <a href="{{ route('obras.show', $otra->slug) }}" class="block group">
-                            <img src="{{ $otra->imagenUrl() }}" alt="{{ $otra->name }}" loading="lazy" class="w-full aspect-square object-cover rounded-lg shadow-sm group-hover:shadow-lg transition">
+                            <img src="{{ $otra->imagenUrl() }}" @if ($otra->srcset()) srcset="{{ $otra->srcset() }}" sizes="(min-width: 768px) 25vw, 50vw" @endif alt="{{ $otra->name }}" loading="lazy" class="w-full aspect-square object-cover rounded-lg shadow-sm group-hover:shadow-lg transition">
                             <span class="block mt-2 text-gray-800 font-medium group-hover:underline">{{ $otra->name }}</span>
                         </a>
                     </li>

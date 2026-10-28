@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -87,6 +88,56 @@ class Product extends Model
     public function imagenUrl(): string
     {
         return asset('storage/obras/'.rawurlencode((string) $this->imagen));
+    }
+
+    // Las miniaturas WebP de cada imagen (App\Actions\GenerarMiniaturas) van en su propia carpeta
+    public function carpetaMiniaturas(): string
+    {
+        return 'obras/miniaturas/'.pathinfo((string) $this->imagen, PATHINFO_FILENAME);
+    }
+
+    /**
+     * Anchos de las miniaturas que existen, de menor a mayor.
+     *
+     * @return list<int>
+     */
+    public function anchosMiniaturas(): array
+    {
+        if (! $this->imagen) {
+            return [];
+        }
+
+        $anchos = array_map(
+            fn (string $fichero) => (int) pathinfo($fichero, PATHINFO_FILENAME),
+            Storage::disk('public')->files($this->carpetaMiniaturas()),
+        );
+        sort($anchos);
+
+        return array_values(array_filter($anchos));
+    }
+
+    // Valor del atributo srcset ("…/400.webp 400w, …/800.webp 800w"); null si la obra no tiene miniaturas
+    public function srcset(): ?string
+    {
+        $carpeta = asset('storage/'.$this->carpetaMiniaturas());
+        $srcset = array_map(fn (int $ancho) => "{$carpeta}/{$ancho}.webp {$ancho}w", $this->anchosMiniaturas());
+
+        return $srcset ? implode(', ', $srcset) : null;
+    }
+
+    // La miniatura más pequeña (para listados); si no hay, la imagen original
+    public function miniaturaUrl(): string
+    {
+        $ancho = $this->anchosMiniaturas()[0] ?? null;
+
+        return $ancho ? asset('storage/'.$this->carpetaMiniaturas()."/{$ancho}.webp") : $this->imagenUrl();
+    }
+
+    public function borrarMiniaturas(): void
+    {
+        if ($this->imagen) {
+            Storage::disk('public')->deleteDirectory($this->carpetaMiniaturas());
+        }
     }
 
     public function precioTexto(): string

@@ -26,11 +26,17 @@ class ProfileController extends Controller
 
         $user->fill($data);
 
-        if ($user->isDirty('email')) {
+        $emailCambiado = $user->isDirty('email');
+        if ($emailCambiado) {
             $user->email_verified_at = null;
         }
 
         $user->save();
+
+        // El email nuevo también hay que verificarlo
+        if ($emailCambiado) {
+            $user->sendEmailVerificationNotification();
+        }
 
         return redirect()->route('profile')->with('success', 'Perfil actualizado');
     }

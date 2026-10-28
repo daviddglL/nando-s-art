@@ -30,6 +30,11 @@ export function crearTarjeta({ obra, posicion }) {
 
     const imagen = document.createElement('img');
     imagen.src = obra.imagen_url;
+    // Con miniaturas WebP el navegador elige la más pequeña que llene la tarjeta (unos 272 px de ancho)
+    if (obra.srcset) {
+        imagen.setAttribute('srcset', obra.srcset);
+        imagen.setAttribute('sizes', '272px');
+    }
     imagen.alt = obra.name;
     imagen.loading = 'lazy';
     imagen.className = 'w-full h-48 object-cover rounded-sm mb-2';

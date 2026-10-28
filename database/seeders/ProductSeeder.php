@@ -2,15 +2,20 @@
 
 namespace Database\Seeders;
 
+use App\Actions\GenerarMiniaturas;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class ProductSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    // Imágenes de las obras de ejemplo (versionadas en el repo). Se pueden sustituir por las fotos reales con el mismo nombre.
+    public const CARPETA_IMAGENES = __DIR__.'/imagenes';
+
+    public function run(GenerarMiniaturas $miniaturas): void
     {
         // Con el modelo (y no DB::table) para que cada obra reciba su slug y su posición
         $obras = [
@@ -71,7 +76,13 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($obras as $obra) {
-            Product::create($obra);
+            // Se copian al disco public (storage/app/public/obras) para que la galería no salga sin fotos
+            $destino = 'obras/'.$obra['imagen'];
+            if (! Storage::disk('public')->exists($destino)) {
+                Storage::disk('public')->put($destino, (string) file_get_contents(self::CARPETA_IMAGENES.'/'.$obra['imagen']));
+            }
+
+            $miniaturas->handle(Product::create($obra));
         }
     }
 }

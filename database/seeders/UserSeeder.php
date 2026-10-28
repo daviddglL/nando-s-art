@@ -28,6 +28,7 @@ class UserSeeder extends Seeder
                 'email' => config('admin.email'),
                 'password' => bcrypt($password),
                 'role' => Role::Admin->value,
+                'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
             ],
         ];
@@ -39,6 +40,7 @@ class UserSeeder extends Seeder
                 'email' => 'admin@example.com',
                 'password' => bcrypt('admin'),
                 'role' => Role::Admin->value,
+                'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
             ];
         }
