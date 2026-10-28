@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use App\Enums\Role;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     // 'role' no es asignable en masa: se asigna a mano solo donde está autorizado
@@ -34,8 +37,11 @@ class User extends Authenticatable
         return $this->role === Role::Admin;
     }
 
-    public function shipments()
+    /**
+     * @return HasMany<Encargo, $this>
+     */
+    public function encargos(): HasMany
     {
-        return $this->hasMany(Shipment::class);
+        return $this->hasMany(Encargo::class);
     }
 }

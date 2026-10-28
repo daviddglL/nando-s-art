@@ -36,7 +36,7 @@
                     </li>
                     @if(Auth::user()->isAdmin())
                         <li>
-                            <a href="{{ route('shipments.index') }}" class="text-blue-500 font-semibold hover:underline">
+                            <a href="{{ route('encargos.index') }}" class="text-blue-500 font-semibold hover:underline">
                                 Presupuestos recibidos
                             </a>
                         </li>

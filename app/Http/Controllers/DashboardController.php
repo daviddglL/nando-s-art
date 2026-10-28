@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    //
-    public function index()
+    public function index(Request $request)
     {
-        $user = Auth::user();
-        $shipments = $user->shipments;
+        $encargos = $request->user()->encargos()->latest()->get();
 
-        return view('dashboard', compact('shipments'));
+        return view('dashboard', compact('encargos'));
     }
 }

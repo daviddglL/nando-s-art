@@ -3,13 +3,17 @@
 namespace App\Models;
 
 use App\Enums\Category;
-use App\Enums\ShipmentStatus;
+use App\Enums\EstadoEncargo;
 use App\Enums\Style;
+use Database\Factories\EncargoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Shipment extends Model
+// Petición de presupuesto de un cliente (en la interfaz: "presupuesto")
+class Encargo extends Model
 {
+    /** @use HasFactory<EncargoFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -24,12 +28,15 @@ class Shipment extends Model
     ];
 
     // style y category no se convierten a enum: son columnas string y puede haber
-    // presupuestos antiguos con valores que ya no existen. Se leen con styleEnum()/categoryEnum().
+    // encargos antiguos con valores que ya no existen. Se leen con styleEnum()/categoryEnum().
     protected $casts = [
-        'status' => ShipmentStatus::class,
+        'status' => EstadoEncargo::class,
     ];
 
-    public function user()
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

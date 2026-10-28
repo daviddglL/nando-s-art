@@ -1,10 +1,10 @@
 <?php
 
 use App\Enums\Category;
-use App\Enums\ShipmentStatus;
+use App\Enums\EstadoEncargo;
 use App\Enums\Style;
+use App\Models\Encargo;
 use App\Models\Product;
-use App\Models\Shipment;
 use App\Models\User;
 use App\Providers\AppServiceProvider;
 use Illuminate\Support\Facades\File;
@@ -62,17 +62,17 @@ test('un presupuesto con un estilo o categoría inventados se rechaza', function
         'style' => 'impresionismo', 'category' => 'fantasia',
     ])->assertSessionHasErrors(['style', 'category']);
 
-    expect(Shipment::count())->toBe(0);
+    expect(Encargo::count())->toBe(0);
 });
 
 test('los presupuestos antiguos con valores que ya no existen se siguen viendo', function () {
     $user = User::factory()->create();
-    $user->shipments()->create([
+    $user->encargos()->create([
         'description' => 'Encargo antiguo', 'height' => 1, 'width' => 1,
         'style' => 'realismo', 'category' => 'Fantasia',
     ]);
 
-    $this->actingAs(admin())->get('/admin/shipments')
+    $this->actingAs(admin())->get('/admin/encargos')
         ->assertOk()
         ->assertSee('realismo')
         ->assertSee('Fantasia')
@@ -81,10 +81,10 @@ test('los presupuestos antiguos con valores que ya no existen se siguen viendo',
 
 test('el dashboard muestra el estado y el estilo en español', function () {
     $user = User::factory()->create();
-    $user->shipments()->create([
+    $user->encargos()->create([
         'description' => 'Mi encargo', 'height' => 1, 'width' => 1,
         'style' => Style::Oleo->value, 'category' => Category::Retrato->value,
-        'status' => ShipmentStatus::Reviewed,
+        'status' => EstadoEncargo::Reviewed,
     ]);
 
     $this->actingAs($user)->get('/dashboard')
@@ -104,7 +104,7 @@ test('las obras devuelven estilo y categoría como enums', function () {
     expect($obra->category)->toBe(Category::Urbano);
 
     // La API sigue mandando el texto, que es lo que espera el carrusel
-    $this->getJson('/api/products?style=lienzo')->assertJsonPath('0.style', 'lienzo');
+    $this->getJson('/api/products?style=lienzo')->assertJsonPath('data.0.style', 'lienzo');
 });
 
 test('el middleware admin está registrado sin Kernel ni providers propios', function () {

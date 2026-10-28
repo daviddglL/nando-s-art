@@ -1,19 +1,19 @@
 <?php
 
+use App\Models\Encargo;
 use App\Models\Product;
-use App\Models\Shipment;
 use App\Models\User;
 
 test('el admin ve el menú y la lista de presupuestos', function () {
     $this->actingAs(admin())
-        ->get('/admin/shipments')
+        ->get('/admin/encargos')
         ->assertOk()
         ->assertSee('Presupuestos recibidos');
 });
 
 test('un usuario normal no puede ver la lista de presupuestos', function () {
     $this->actingAs(User::factory()->create())
-        ->get('/admin/shipments')
+        ->get('/admin/encargos')
         ->assertForbidden();
 });
 
@@ -30,7 +30,7 @@ test('un usuario envía un presupuesto y lo ve en su dashboard', function () {
         'category' => 'retrato',
     ])->assertRedirect('/dashboard');
 
-    expect($user->shipments()->count())->toBe(1);
+    expect($user->encargos()->count())->toBe(1);
 
     $this->actingAs($user)->get('/dashboard')
         ->assertOk()
@@ -38,16 +38,16 @@ test('un usuario envía un presupuesto y lo ve en su dashboard', function () {
 });
 
 test('el admin puede borrar un presupuesto', function () {
-    $shipment = User::factory()->create()->shipments()->create([
+    $encargo = User::factory()->create()->encargos()->create([
         'description' => 'x', 'height' => 1, 'width' => 1,
         'style' => 'oleo', 'category' => 'otro',
     ]);
 
     $this->actingAs(admin())
-        ->delete("/admin/shipments/{$shipment->id}")
-        ->assertRedirect('/admin/shipments');
+        ->delete("/admin/encargos/{$encargo->id}")
+        ->assertRedirect('/admin/encargos');
 
-    expect(Shipment::count())->toBe(0);
+    expect(Encargo::count())->toBe(0);
 });
 
 test('la API del carrusel filtra las obras por estilo', function () {
@@ -57,8 +57,8 @@ test('la API del carrusel filtra las obras por estilo', function () {
 
     $this->getJson('/api/products?style=acuarela')
         ->assertOk()
-        ->assertJsonCount(1)
-        ->assertJsonPath('0.name', 'Acuarela 1');
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', 'Acuarela 1');
 });
 
 test('la API de obras no permite crear sin pasar por el admin', function () {

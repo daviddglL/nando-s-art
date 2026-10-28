@@ -2,49 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Category;
+use App\Actions\CreateProduct;
 use App\Enums\Style;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): AnonymousResourceCollection
     {
         // El carrusel de la galería pide /api/products?style=acuarela
-        return Product::query()
+        $request->validate(['style' => ['nullable', Rule::enum(Style::class)]]);
+
+        $products = Product::query()
             ->when($request->query('style'), fn ($query, $style) => $query->where('style', $style))
             ->get();
+
+        return ProductResource::collection($products);
     }
 
-    public function show(Product $product)
+    public function show(Product $product): ProductResource
     {
-        return $product;
+        return new ProductResource($product);
     }
 
     public function create()
     {
+        Gate::authorize('create', Product::class);
+
         return view('admin.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request, CreateProduct $createProduct)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'height' => 'required|numeric',
-            'width' => 'required|numeric',
-            'style' => ['required', Rule::enum(Style::class)],
-            'category' => ['required', Rule::enum(Category::class)],
-            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
-
-        // Nombre aleatorio: el cliente no decide el nombre y dos obras nunca comparten imagen.
-        // Se guarda en storage/app/public/obras (visible en /storage/obras con `php artisan storage:link`)
-        $validated['imagen'] = basename($request->file('imagen')->store('obras', 'public'));
-
-        Product::create($validated);
+        $createProduct->handle($request->safe()->except('imagen'), $request->file('imagen'));
 
         return redirect()->route('galeria')->with('success', 'Obra creada correctamente');
     }
