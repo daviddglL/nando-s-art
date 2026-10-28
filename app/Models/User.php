@@ -32,6 +32,14 @@ class User extends Authenticatable
         'role' => Role::class,
     ];
 
+    protected static function booted(): void
+    {
+        // El ON DELETE CASCADE de la base de datos no borraría las imágenes privadas de sus encargos
+        static::deleting(function (User $user) {
+            $user->encargos->each->delete();
+        });
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === Role::Admin;

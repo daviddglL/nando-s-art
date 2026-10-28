@@ -19,7 +19,7 @@ class SolicitarPresupuesto
      */
     public function handle(User $cliente, array $data, ?UploadedFile $imagen = null): Encargo
     {
-        $data['imagen'] = $imagen?->store('presupuestos', 'public') ?: null;
+        $data['imagen'] = $imagen?->store('presupuestos', Encargo::DISCO_IMAGENES) ?: null;
 
         // El encargo siempre pertenece al cliente que lo pide, nunca a un user_id enviado en el formulario
         unset($data['user_id']);

@@ -34,7 +34,7 @@ Configura también `MAIL_*` en `.env` (por defecto `MAIL_MAILER=log` solo los es
 ## Qué puede hacer cada uno
 
 - **Visitantes**: galería por estilos, ficha de cada obra en `/obras/{slug}` (con imagen a pantalla completa) y `sitemap.xml`.
-- **Clientes**: pedir presupuestos (con imagen de referencia) y ver en "Mis presupuestos" el estado, la respuesta y el precio.
+- **Clientes**: pedir presupuestos (con imagen de referencia, que es privada: solo la ven el cliente y el admin) y ver en "Mis presupuestos" el estado, la respuesta y el precio.
 - **Admin** (`/admin`): crear, editar, ordenar, borrar (papelera) y restaurar obras en `/admin/obras`; responder presupuestos y cambiar su estado en `/admin/encargos`.
 
 ## Arquitectura (MVI)

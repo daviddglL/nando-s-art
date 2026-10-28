@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -55,9 +56,15 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => ['sometimes', 'required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => 'sometimes|required|string|min:8',
+            'password' => ['sometimes', 'required', 'string', Password::defaults()],
             'role' => ['sometimes', Rule::enum(Role::class)],
         ]);
+
+        // Cambiar la contraseña o el email de la propia cuenta exige la contraseña actual,
+        // igual que en /profile: una sesión robada no basta para quedarse con la cuenta
+        if ($request->user()->is($user) && ($request->has('password') || $request->has('email'))) {
+            $request->validate(['current_password' => ['required', 'current_password']]);
+        }
 
         if (array_key_exists('role', $data)) {
             Gate::authorize('changeRole', $user);
@@ -69,6 +76,10 @@ class UserController extends Controller
         }
 
         $user->fill(array_intersect_key($data, array_flip(['name', 'email'])));
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
         $user->save();
 
         return $user;

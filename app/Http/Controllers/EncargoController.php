@@ -10,7 +10,9 @@ use App\Http\Requests\UpdateEncargoRequest;
 use App\Models\Encargo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EncargoController extends Controller
 {
@@ -37,6 +39,20 @@ class EncargoController extends Controller
         $encargo->load('user');
 
         return view('encargos.show', compact('encargo'));
+    }
+
+    // Imagen de referencia: privada, solo para el cliente que pidió el presupuesto y para el admin
+    public function imagen(Encargo $encargo): StreamedResponse
+    {
+        Gate::authorize('view', $encargo);
+
+        $disco = Storage::disk(Encargo::DISCO_IMAGENES);
+        abort_unless($encargo->imagen && $disco->exists($encargo->imagen), 404);
+
+        return $disco->response($encargo->imagen, null, [
+            'Cache-Control' => 'private, max-age=3600',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     public function create()
