@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Shipment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ShipmentController extends Controller
 {
@@ -23,33 +22,29 @@ class ShipmentController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
+        $validated = $request->validate([
             'description' => 'required|string',
             'height' => 'required|numeric',
             'width' => 'required|numeric',
             'style' => 'required|string',
             'category' => 'required|string',
-            // ...otros campos si los hay...
+            'imagen' => 'nullable|image|max:2048',
         ]);
 
-        Shipment::create([
-            'user_id' => $request->user_id,
-            'description' => $request->description,
-            'height' => $request->height,
-            'width' => $request->width,
-            'style' => $request->style,
-            'category' => $request->category,
-            'status' => 'pending',
-            // ...otros campos si los hay...
-        ]);
+        if ($request->hasFile('imagen')) {
+            $validated['imagen'] = $request->file('imagen')->store('presupuestos', 'public');
+        }
 
-        return redirect()->route('shipments.index')->with('success', 'Shipment creado correctamente');
+        // El presupuesto siempre pertenece al usuario autenticado
+        $request->user()->shipments()->create($validated + ['status' => 'pending']);
+
+        $ruta = $request->user()->role === 'admin' ? 'shipments.index' : 'dashboard';
+
+        return redirect()->route($ruta)->with('success', 'Presupuesto enviado correctamente');
     }
 
-    public function destroy($id)
+    public function destroy(Shipment $shipment)
     {
-        $shipment = Shipment::findOrFail($id);
         $shipment->delete();
 
         return redirect()->route('shipments.index')->with('success', 'Shipment eliminado correctamente');

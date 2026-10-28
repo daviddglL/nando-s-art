@@ -30,7 +30,11 @@ Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria');
 // Rutas solo para admin (añadir productos)
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/galeria/nuevo', [ProductController::class, 'create'])->name('products.create');
-Route::post('/api/products', [ProductController::class, 'store'])->name('products.store');
+    Route::post('/galeria', [ProductController::class, 'store'])->name('products.store');
+
+    // Gestión de presupuestos (shipments)
+    Route::get('/admin/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
+    Route::delete('/admin/shipments/{shipment}', [ShipmentController::class, 'destroy'])->name('shipments.destroy');
 });
 
 // Ruta para obtener frase del día (proxy para evitar CORS)
@@ -50,7 +54,7 @@ Route::get('/admin', [AdminController::class, 'index'])->middleware(['auth', 'ad
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/presupuesto', [ShipmentController::class, 'create'])->name('shipments.create');
-    Route::post('/api/presupuesto', [ShipmentController::class, 'store'])->name('api.shipments.store');
+    Route::post('/presupuesto', [ShipmentController::class, 'store'])->name('shipments.store');
 
 });
 
