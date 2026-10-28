@@ -20,15 +20,22 @@ class ProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'slug' => $this->slug,
             'name' => $this->name,
             'description' => $this->description,
+            'year' => $this->year,
+            'price' => $this->price,
+            'precio_texto' => $this->precioTexto(),
+            'available' => $this->available,
+            'featured' => $this->featured,
             'height' => $this->height,
             'width' => $this->width,
             'style' => $this->style->value,
             'style_label' => $this->style->label(),
             'category' => $this->category->value,
             'category_label' => $this->category->label(),
-            'imagen_url' => asset('storage/obras/'.rawurlencode((string) $this->imagen)),
+            'imagen_url' => $this->imagenUrl(),
+            'url' => route('obras.show', $this->slug),
         ];
     }
 }

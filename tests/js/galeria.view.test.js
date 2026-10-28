@@ -84,4 +84,13 @@ describe('vista de la galería', () => {
         expect(dom.carrusel.querySelector('h3').textContent).toBe('<img src=x onerror=alert(1)>');
         expect(dom.carrusel.querySelectorAll('img')).toHaveLength(1);
     });
+
+    it('enlaza cada obra con su ficha, enfocable solo en la tarjeta central', () => {
+        const obras = [1, 2, 3].map((id) => obra(id, { url: `/obras/obra-${id}` }));
+        render({ ...estadoInicial, estilo: 'acuarela', obras, indice: 1 }, dom, config);
+
+        const enlaces = [...dom.carrusel.querySelectorAll('a')];
+        expect(enlaces.map((a) => a.getAttribute('href'))).toEqual(['/obras/obra-1', '/obras/obra-2', '/obras/obra-3']);
+        expect(enlaces.map((a) => a.tabIndex)).toEqual([-1, 0, -1]);
+    });
 });

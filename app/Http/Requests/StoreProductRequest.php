@@ -16,6 +16,15 @@ class StoreProductRequest extends FormRequest
         return $this->user()?->can('create', Product::class) ?? false;
     }
 
+    // Las casillas sin marcar no llegan en el formulario: se convierten en false
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'available' => $this->boolean('available'),
+            'featured' => $this->boolean('featured'),
+        ]);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -24,6 +33,10 @@ class StoreProductRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'year' => 'nullable|integer|min:1900|max:'.(date('Y') + 1),
+            'price' => 'nullable|numeric|min:0|max:99999999',
+            'available' => 'boolean',
+            'featured' => 'boolean',
             'height' => 'required|numeric|min:0',
             'width' => 'required|numeric|min:0',
             'style' => ['required', Rule::enum(Style::class)],

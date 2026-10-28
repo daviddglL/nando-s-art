@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class ProductSeeder extends Seeder
 {
@@ -12,7 +12,8 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('products')->insert([
+        // Con el modelo (y no DB::table) para que cada obra reciba su slug y su posición
+        $obras = [
             [
                 'name' => 'Casa Embrujada',
                 'description' => 'Esta ilustración destaca por su estilo surrealista y macabro. La casa toma rasgos antropomórficos con enormes ojos inyectados de sangre y una boca abierta en forma de puerta, lo que genera una sensación de inquietud y vida monstruosa.',
@@ -21,8 +22,6 @@ class ProductSeeder extends Seeder
                 'style' => 'acuarela',
                 'category' => 'urbano',
                 'imagen' => 'casa-embrujada.webp',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'Caseta Rústica',
@@ -32,8 +31,6 @@ class ProductSeeder extends Seeder
                 'style' => 'acuarela',
                 'category' => 'urbano',
                 'imagen' => 'caseta.webp',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'Casa en la Isla',
@@ -43,8 +40,6 @@ class ProductSeeder extends Seeder
                 'style' => 'acuarela',
                 'category' => 'paisaje',
                 'imagen' => 'acuarela-isla.webp',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'Atardecer en la atalaya',
@@ -54,8 +49,6 @@ class ProductSeeder extends Seeder
                 'style' => 'acuarela',
                 'category' => 'paisaje',
                 'imagen' => 'acuarela-japon.webp',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'Masión en el bosque',
@@ -65,8 +58,6 @@ class ProductSeeder extends Seeder
                 'style' => 'acuarela',
                 'category' => 'urbano',
                 'imagen' => 'acuarela-mansion.webp',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'Transporte de la ciudad',
@@ -76,10 +67,11 @@ class ProductSeeder extends Seeder
                 'style' => 'acuarela',
                 'category' => 'urbano',
                 'imagen' => 'acuarela-tren.webp',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
+        ];
 
-        ]);
+        foreach ($obras as $obra) {
+            Product::create($obra);
+        }
     }
 }

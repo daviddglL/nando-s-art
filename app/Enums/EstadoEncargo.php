@@ -19,4 +19,14 @@ enum EstadoEncargo: string
             self::Completed => 'Completado',
         };
     }
+
+    // Etiqueta de color en las listas de presupuestos
+    public function badgeClasses(): string
+    {
+        return match ($this) {
+            self::Pending => 'bg-yellow-100 text-yellow-900',
+            self::Reviewed => 'bg-blue-100 text-blue-900',
+            self::Completed => 'bg-green-100 text-green-900',
+        };
+    }
 }

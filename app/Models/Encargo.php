@@ -25,12 +25,16 @@ class Encargo extends Model
         'category',
         'imagen',
         'status',
+        'respuesta',
+        'precio',
     ];
 
     // style y category no se convierten a enum: son columnas string y puede haber
     // encargos antiguos con valores que ya no existen. Se leen con styleEnum()/categoryEnum().
     protected $casts = [
         'status' => EstadoEncargo::class,
+        'precio' => 'decimal:2',
+        'respondido_at' => 'datetime',
     ];
 
     /**
@@ -39,6 +43,17 @@ class Encargo extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    // La imagen de referencia se guarda con su carpeta (presupuestos/...) en el disco public
+    public function imagenUrl(): ?string
+    {
+        return $this->imagen ? asset('storage/'.$this->imagen) : null;
+    }
+
+    public function precioTexto(): string
+    {
+        return $this->precio === null ? 'Sin precio todavía' : number_format((float) $this->precio, 2, ',', '.').' €';
     }
 
     public function styleEnum(): ?Style
