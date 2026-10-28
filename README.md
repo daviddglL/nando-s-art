@@ -27,7 +27,3 @@ Los estilos ya no vienen de un CDN: si no se ejecuta `npm run build` (o `npm run
 php artisan test
 ./vendor/bin/pint --test
 ```
-
-## Documentación
-
-El análisis del proyecto, el plan por fases y la evolución están en [`docs/ANALISIS_Y_MEJORAS.md`](docs/ANALISIS_Y_MEJORAS.md).
