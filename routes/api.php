@@ -5,7 +5,10 @@ use App\Http\Controllers\ShipmentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ImageUploadController;
 
-Route::apiResource('users', UserController::class);
+// Usuarios: requiere sesión iniciada; los permisos finos están en UserPolicy
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::apiResource('users', UserController::class);
+});
 Route::apiResource('products', ProductController::class);
 Route::apiResource('shipments', ShipmentController::class);
 
