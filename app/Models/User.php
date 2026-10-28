@@ -10,8 +10,9 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    // 'role' no es asignable en masa: se asigna a mano solo donde está autorizado
     protected $fillable = [
-        'name', 'email', 'password', 'role'
+        'name', 'email', 'password',
     ];
 
     protected $hidden = [

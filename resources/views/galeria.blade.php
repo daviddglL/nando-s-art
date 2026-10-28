@@ -1,15 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galería</title>
-</head>
-<body class="bg-gray-100">
-
-
-
-{{-- filepath: c:\Users\ragna\OneDrive\Escritorio\nando-s-art\resources\views\galeria.blade.php --}}
 @extends('layouts.app')
 @section('content')
 <main id="galeria-main" class="flex flex-col items-center min-h-screen bg-gray-100 transition-colors duration-500">
@@ -76,8 +64,7 @@
 </footer>
 @endsection
 
-@yield('scripts')
-
+@section('scripts')
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const botones = document.querySelectorAll(".filtro-estilo");
@@ -130,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Marca el botón seleccionado
         seleccionarBoton(estilo);
 
-        fetch(`/api/products?style=${estilo}`)
+        fetch(`/api/products?style=${encodeURIComponent(estilo)}`)
             .then(response => response.json())
             .then(data => {
                 productos = data;
@@ -139,9 +126,30 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     };
 
+    const crearElemento = (etiqueta, clases, texto) => {
+        const el = document.createElement(etiqueta);
+        el.className = clases;
+        el.textContent = texto;
+        return el;
+    };
+
+    const crearImagen = (producto) => {
+        const img = document.createElement("img");
+        img.src = `/storage/obras/${encodeURIComponent(producto.imagen)}`;
+        img.alt = producto.name;
+        img.loading = "lazy";
+        img.className = "w-full h-48 object-cover rounded mb-2";
+        return img;
+    };
+
     const renderCarrusel = (data, indexCentral) => {
-        contenedor.innerHTML = "";
+        contenedor.replaceChildren();
         const total = data.length;
+        if (total === 0) {
+            contenedor.append(crearElemento("p", "w-full text-center text-gray-600 py-12", "Todavía no hay obras de este estilo."));
+            contenedor.style.transform = "none";
+            return;
+        }
         const visible = Math.min(5, total); // máximo 5 visibles
         const half = Math.floor(visible / 2);
 
@@ -171,13 +179,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const card = document.createElement("div");
             card.className = `min-w-[400px] max-w-[400px] h-[520px] bg-white p-6 rounded-2xl border border-gray-300 flex-shrink-0 flex flex-col justify-between mx-2 transition-all duration-500 ease-in-out ${extraClasses}`;
-            card.innerHTML = `
-                <h3 class="text-xl font-bold text-gray-800 mb-2">${producto.name}</h3>
-                <img src="/storage/obras/${producto.imagen}" alt="${producto.name}" class="w-full h-48 object-cover rounded mb-2"/>
-                <p class="text-gray-600">${producto.description}</p>
-                <p class="text-sm text-gray-500 mt-1">Tamaño: ${producto.height} x ${producto.width}</p>
-                <p class="text-sm text-gray-500">Categoría: ${producto.category}</p>
-            `;
+            // Se construye con textContent para que el texto de las obras nunca se interprete como HTML
+            card.append(
+                crearElemento("h3", "text-xl font-bold text-gray-800 mb-2", producto.name),
+                crearImagen(producto),
+                crearElemento("p", "text-gray-600", producto.description),
+                crearElemento("p", "text-sm text-gray-500 mt-1", `Tamaño: ${producto.height} x ${producto.width}`),
+                crearElemento("p", "text-sm text-gray-500", `Categoría: ${producto.category}`)
+            );
             contenedor.appendChild(card);
         });
 
@@ -216,5 +225,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 </script>
-</body>
-</html>
+@endsection

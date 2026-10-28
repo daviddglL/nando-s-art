@@ -1,15 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\Route;
-
-beforeEach(function () {
-    // routes/api.php todavía no se registra en bootstrap/app.php; lo cargamos aquí si hace falta
-    if (! Route::has('users.index')) {
-        Route::prefix('api')->group(base_path('routes/api.php'));
-        Route::getRoutes()->refreshNameLookups();
-    }
-});
 
 function admin(): User
 {

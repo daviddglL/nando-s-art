@@ -3,7 +3,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 
 class ProductController extends Controller
@@ -35,27 +34,14 @@ public function store(Request $request)
         'description' => 'required|string',
         'height' => 'required|numeric',
         'width' => 'required|numeric',
-        'style' => 'required|string',
-        'category' => 'required|string',
-        'imagen' => 'required|image|max:2048',
+        'style' => 'required|in:acuarela,rotulador,oleo,sketch,papel,lienzo',
+        'category' => 'required|in:retrato,paisaje,abstracto,urbano,otro',
+        'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
     ]);
 
-    if ($request->hasFile('imagen')) {
-        $file = $request->file('imagen');
-        $nombreImagen = $file->getClientOriginalName();
-
-        // Ruta absoluta donde guardar la imagen:
-        $rutaFisica = public_path('storage/obras/' . $nombreImagen);
-
-        if (file_exists($rutaFisica)) {
-            // Si ya existe, solo guardamos la ruta relativa
-            $validated['imagen'] =  $nombreImagen;
-        } else {
-            // Movemos el archivo a la ruta física deseada
-            $file->move(public_path('storage/obras'), $nombreImagen);
-            $validated['imagen'] =  $nombreImagen;
-        }
-    }
+    // Nombre aleatorio: el cliente no decide el nombre y dos obras nunca comparten imagen.
+    // Se guarda en storage/app/public/obras (visible en /storage/obras con `php artisan storage:link`)
+    $validated['imagen'] = basename($request->file('imagen')->store('obras', 'public'));
 
     Product::create($validated);
 

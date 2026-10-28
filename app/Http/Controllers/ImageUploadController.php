@@ -4,22 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ImageUploadController extends Controller
 {
     public function upload(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
 
-        $filename = Str::uuid() . '.' . $request->file('image')->getClientOriginalExtension();
-        $path = $request->file('image')->storeAs('public/imagenes', $filename);
+        // Sin SVG (puede llevar JavaScript) y con nombre aleatorio y extensión según el contenido real
+        $path = $request->file('image')->store('imagenes', 'public');
 
         return response()->json([
             'message' => 'Imagen subida correctamente',
-            'url' => asset('storage/imagenes/' . $filename)
+            'url' => Storage::disk('public')->url($path),
         ]);
     }
 }
