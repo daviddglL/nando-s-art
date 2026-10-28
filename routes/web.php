@@ -6,6 +6,7 @@ use App\Http\Controllers\EncargoController;
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\ObraController;
 use App\Http\Controllers\ObraImagenController;
+use App\Http\Controllers\PortadaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SitemapController;
@@ -15,8 +16,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
-// Ruta de inicio
-Route::view('/', 'landing')->name('landing');
+// Portada, con las obras destacadas
+Route::get('/', PortadaController::class)->name('landing');
 
 // Ruta pública para ver la galería (solo visualización)
 Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria');
@@ -92,6 +93,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->withTrashed()
         ->name('admin.obras.force-destroy');
     Route::patch('/admin/obras/{obra}/mover', [ProductController::class, 'mover'])->name('admin.obras.mover');
+    Route::patch('/admin/obras/{obra}/destacar', [ProductController::class, 'destacar'])->name('admin.obras.destacar');
 
     // Imágenes adicionales de cada obra: subir varias, ordenarlas, elegir la principal y borrarlas
     Route::post('/admin/obras/{obra}/imagenes', [ObraImagenController::class, 'store'])->name('admin.obras.imagenes.store');
