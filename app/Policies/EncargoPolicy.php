@@ -25,6 +25,12 @@ class EncargoPolicy
         return true;
     }
 
+    // Responder y cambiar el estado es cosa del admin
+    public function update(User $user, Encargo $encargo): bool
+    {
+        return $user->isAdmin();
+    }
+
     public function delete(User $user, Encargo $encargo): bool
     {
         return $user->isAdmin();

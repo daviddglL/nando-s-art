@@ -42,6 +42,15 @@ export function crearTarjeta({ obra, posicion }) {
         crearElemento('p', 'text-sm text-gray-500', `Categoría: ${obra.category_label}`),
     );
 
+    // Enlace a la ficha de la obra (/obras/{slug}); solo se puede enfocar en la tarjeta central
+    if (obra.url) {
+        const enlace = crearElemento('a', 'mt-2 text-blue-600 font-semibold hover:underline', 'Ver obra');
+        enlace.href = obra.url;
+        enlace.setAttribute('aria-label', `Ver la ficha de ${obra.name}`);
+        if (posicion !== 0) enlace.tabIndex = -1;
+        tarjeta.append(enlace);
+    }
+
     return tarjeta;
 }
 

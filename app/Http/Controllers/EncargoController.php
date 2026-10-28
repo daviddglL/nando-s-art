@@ -2,22 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ResponderEncargo;
 use App\Actions\SolicitarPresupuesto;
+use App\Enums\EstadoEncargo;
 use App\Http\Requests\StoreEncargoRequest;
+use App\Http\Requests\UpdateEncargoRequest;
 use App\Models\Encargo;
-use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class EncargoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('viewAny', Encargo::class);
 
-        $encargos = Encargo::with('user')->latest()->get();
-        $users = User::all();
+        // ?estado=pending filtra la lista; sin filtro salen todos, los más nuevos primero
+        $estado = $request->validate(['estado' => ['nullable', Rule::enum(EstadoEncargo::class)]])['estado'] ?? null;
 
-        return view('encargos.index', compact('encargos', 'users'));
+        $encargos = Encargo::with('user')
+            ->when($estado, fn ($query) => $query->where('status', $estado))
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('encargos.index', compact('encargos', 'estado'));
+    }
+
+    public function show(Encargo $encargo)
+    {
+        Gate::authorize('view', $encargo);
+
+        $encargo->load('user');
+
+        return view('encargos.show', compact('encargo'));
     }
 
     public function create()
@@ -34,6 +53,13 @@ class EncargoController extends Controller
         $ruta = $request->user()->isAdmin() ? 'encargos.index' : 'dashboard';
 
         return redirect()->route($ruta)->with('success', 'Presupuesto enviado correctamente');
+    }
+
+    public function update(UpdateEncargoRequest $request, Encargo $encargo, ResponderEncargo $responder)
+    {
+        $responder->handle($encargo, $request->validated());
+
+        return redirect()->route('encargos.show', $encargo)->with('success', 'Presupuesto actualizado; el cliente recibirá un email');
     }
 
     public function destroy(Encargo $encargo)
