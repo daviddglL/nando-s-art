@@ -26,6 +26,27 @@
 
     </div>
 
+    {{-- Obras destacadas: las marca el admin en /admin/obras --}}
+    @if ($destacadas->isNotEmpty())
+        <section class="w-full max-w-5xl mb-16" aria-labelledby="titulo-destacadas">
+            <h2 id="titulo-destacadas" class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Obras destacadas</h2>
+            <ul class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                @foreach ($destacadas as $obra)
+                    <li>
+                        <a href="{{ route('obras.show', $obra->slug) }}" class="block group bg-white/80 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+                            <img src="{{ $obra->imagenUrl() }}" @if ($obra->srcset()) srcset="{{ $obra->srcset() }}" sizes="(min-width: 768px) 320px, 50vw" @endif alt="{{ $obra->name }}" loading="lazy" class="w-full aspect-square object-cover">
+                            <span class="block px-3 pt-2 font-semibold text-gray-800 group-hover:underline">{{ $obra->name }}</span>
+                            <span class="block px-3 pb-3 text-sm text-gray-600">{{ $obra->available ? $obra->precioTexto() : 'Vendida' }}</span>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+            <p class="text-center mt-6">
+                <a href="{{ route('galeria') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-sm">Ver toda la galería</a>
+            </p>
+        </section>
+    @endif
+
     <!-- Sección Zig-Zag -->
     <section class="mt-8 space-y-20 max-w-5xl w-full">
         <!-- Bloque 1 -->

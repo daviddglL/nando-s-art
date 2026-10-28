@@ -25,6 +25,9 @@ class Product extends Model
     // Días que pasa una obra en la papelera antes de que `model:prune` la borre definitivamente
     public const DIAS_PAPELERA = 30;
 
+    // Obras destacadas que caben en la portada
+    public const MAX_DESTACADAS = 6;
+
     protected $fillable = [
         'name',
         'slug',
@@ -105,6 +108,16 @@ class Product extends Model
     public function scopeOrdenadas(Builder $query): void
     {
         $query->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * Obras que el admin ha marcado como destacadas, en el orden de la galería (salen en la portada).
+     *
+     * @param  Builder<Product>  $query
+     */
+    public function scopeDestacadas(Builder $query): void
+    {
+        $query->where('featured', true)->ordenadas();
     }
 
     public function imagenUrl(): string
