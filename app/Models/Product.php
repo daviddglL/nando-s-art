@@ -8,6 +8,7 @@ use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -16,10 +17,13 @@ use Illuminate\Support\Str;
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, Prunable, SoftDeletes;
 
     // Clave de caché que cambia cada vez que se toca una obra: así la API nunca sirve datos viejos
     public const VERSION_CACHE = 'obras.version';
+
+    // Días que pasa una obra en la papelera antes de que `model:prune` la borre definitivamente
+    public const DIAS_PAPELERA = 30;
 
     protected $fillable = [
         'name',
@@ -60,6 +64,24 @@ class Product extends Model
         static::saved($invalidar);
         static::deleted($invalidar);
         static::restored($invalidar);
+
+        // Al borrar definitivamente (desde la papelera o al purgarla) se borran también la imagen y sus miniaturas
+        static::forceDeleted(function (Product $obra) {
+            if ($obra->imagen) {
+                Storage::disk('public')->delete('obras/'.$obra->imagen);
+                $obra->borrarMiniaturas();
+            }
+        });
+    }
+
+    /**
+     * Obras que `php artisan model:prune` borra: las que llevan más de DIAS_PAPELERA en la papelera.
+     *
+     * @return Builder<Product>
+     */
+    public function prunable(): Builder
+    {
+        return static::onlyTrashed()->where('deleted_at', '<=', now()->subDays(self::DIAS_PAPELERA));
     }
 
     // El slug no cambia al renombrar la obra: los enlaces compartidos siguen funcionando

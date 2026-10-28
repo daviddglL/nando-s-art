@@ -1,8 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 import { cargarObras, crearEfectos } from '../../resources/js/galeria/effects.js';
-import { ERROR_CARGA, OBRAS_CARGADAS, seleccionarEstilo, siguienteObra } from '../../resources/js/galeria/intents.js';
+import {
+    buscar,
+    ERROR_CARGA,
+    OBRAS_CARGADAS,
+    seleccionarCategoria,
+    seleccionarEstilo,
+    siguienteObra,
+} from '../../resources/js/galeria/intents.js';
 import { reducer } from '../../resources/js/galeria/reducer.js';
-import { estadoInicial } from '../../resources/js/galeria/state.js';
+import { claveFiltros, estadoInicial } from '../../resources/js/galeria/state.js';
 import { crearStore } from '../../resources/js/galeria/store.js';
 
 const respuesta = (body, ok = true, status = 200) => Promise.resolve({ ok, status, json: () => Promise.resolve(body) });
@@ -41,27 +48,51 @@ describe('store', () => {
         expect(store.getState()).toMatchObject({ estilo: 'acuarela', cargando: false, indice: 1 });
         expect(store.getState().obras).toHaveLength(3);
     });
+
+    it('combina el estilo, el tema y la búsqueda en la petición', async () => {
+        const fetchFn = vi.fn(() => respuesta({ data: [] }));
+        const store = crearStore(reducer, estadoInicial, crearEfectos(fetchFn));
+
+        await store.dispatch(seleccionarEstilo('oleo'));
+        await store.dispatch(seleccionarCategoria('retrato'));
+        await store.dispatch(buscar('gato'));
+
+        expect(fetchFn).toHaveBeenLastCalledWith('/api/products?style=oleo&category=retrato&q=gato', expect.any(Object));
+        expect(store.getState()).toMatchObject({ categoria: 'retrato', busqueda: 'gato', cargando: false });
+    });
+
+    it('no repite la petición si la búsqueda no ha cambiado', async () => {
+        const fetchFn = vi.fn(() => respuesta({ data: [] }));
+        const store = crearStore(reducer, estadoInicial, crearEfectos(fetchFn));
+
+        await store.dispatch(seleccionarEstilo('oleo'));
+        await store.dispatch(buscar(''));
+
+        expect(fetchFn).toHaveBeenCalledOnce();
+    });
 });
 
 describe('cargarObras', () => {
-    it('codifica el estilo en la URL', async () => {
+    const filtros = (estilo, extra = {}) => ({ estilo, categoria: '', busqueda: '', ...extra });
+
+    it('codifica los filtros en la URL', async () => {
         const fetchFn = vi.fn(() => respuesta({ data: [] }));
 
-        await cargarObras('a&b', fetchFn);
+        await cargarObras(filtros('a&b', { busqueda: 'x?y' }), fetchFn);
 
-        expect(fetchFn.mock.calls[0][0]).toBe('/api/products?style=a%26b');
+        expect(fetchFn.mock.calls[0][0]).toBe('/api/products?style=a%26b&q=x%3Fy');
     });
 
-    it('devuelve OBRAS_CARGADAS con el array data de la API', async () => {
-        const intent = await cargarObras('oleo', () => respuesta({ data: [{ id: 7 }] }));
+    it('devuelve OBRAS_CARGADAS con el array data de la API y la clave de los filtros', async () => {
+        const intent = await cargarObras(filtros('oleo'), () => respuesta({ data: [{ id: 7 }] }));
 
-        expect(intent).toEqual({ type: OBRAS_CARGADAS, estilo: 'oleo', obras: [{ id: 7 }] });
+        expect(intent).toEqual({ type: OBRAS_CARGADAS, clave: claveFiltros(filtros('oleo')), obras: [{ id: 7 }] });
     });
 
     it('convierte un error HTTP o de red en ERROR_CARGA', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {});
 
-        expect((await cargarObras('oleo', () => respuesta({}, false, 500))).type).toBe(ERROR_CARGA);
-        expect((await cargarObras('oleo', () => Promise.reject(new Error('sin red')))).type).toBe(ERROR_CARGA);
+        expect((await cargarObras(filtros('oleo'), () => respuesta({}, false, 500))).type).toBe(ERROR_CARGA);
+        expect((await cargarObras(filtros('oleo'), () => Promise.reject(new Error('sin red')))).type).toBe(ERROR_CARGA);
     });
 });

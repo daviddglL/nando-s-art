@@ -1,14 +1,33 @@
-import { ANTERIOR_OBRA, ERROR_CARGA, OBRAS_CARGADAS, SELECCIONAR_ESTILO, SIGUIENTE_OBRA } from './intents.js';
+import {
+    ANTERIOR_OBRA,
+    BUSCAR,
+    ERROR_CARGA,
+    OBRAS_CARGADAS,
+    SELECCIONAR_CATEGORIA,
+    SELECCIONAR_ESTILO,
+    SIGUIENTE_OBRA,
+} from './intents.js';
+import { claveFiltros } from './state.js';
 
 // Reducer: función pura (estado, intent) => nuevo estado. No toca el DOM ni hace peticiones.
 export function reducer(estado, intent) {
     switch (intent.type) {
         case SELECCIONAR_ESTILO:
-            return { ...estado, estilo: intent.estilo, obras: [], indice: 0, cargando: true, error: null };
+            return filtrar(estado, { estilo: intent.estilo });
+
+        case SELECCIONAR_CATEGORIA:
+            return filtrar(estado, { categoria: intent.categoria ?? '' });
+
+        case BUSCAR: {
+            const busqueda = (intent.texto ?? '').trim();
+            // Escribir un espacio de más no vuelve a pedir las obras
+            if (busqueda === estado.busqueda) return estado;
+            return filtrar(estado, { busqueda });
+        }
 
         case OBRAS_CARGADAS:
-            // Si el usuario ya ha cambiado de estilo, la respuesta antigua se descarta
-            if (intent.estilo !== estado.estilo) return estado;
+            // Si el usuario ya ha cambiado los filtros, la respuesta antigua se descarta
+            if (intent.clave !== claveFiltros(estado)) return estado;
             return {
                 ...estado,
                 obras: intent.obras,
@@ -18,7 +37,7 @@ export function reducer(estado, intent) {
             };
 
         case ERROR_CARGA:
-            if (intent.estilo !== estado.estilo) return estado;
+            if (intent.clave !== claveFiltros(estado)) return estado;
             return { ...estado, obras: [], indice: 0, cargando: false, error: intent.mensaje };
 
         case SIGUIENTE_OBRA:
@@ -30,6 +49,11 @@ export function reducer(estado, intent) {
         default:
             return estado;
     }
+}
+
+// Cambia un filtro: vacía las obras y marca que hay que cargarlas de nuevo
+function filtrar(estado, cambios) {
+    return { ...estado, ...cambios, obras: [], indice: 0, cargando: true, error: null };
 }
 
 // Avanza o retrocede en bucle; sin obras no hace nada

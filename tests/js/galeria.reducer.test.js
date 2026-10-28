@@ -1,11 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { anteriorObra, errorCarga, obrasCargadas, seleccionarEstilo, siguienteObra } from '../../resources/js/galeria/intents.js';
+import {
+    anteriorObra,
+    buscar,
+    errorCarga,
+    obrasCargadas,
+    seleccionarCategoria,
+    seleccionarEstilo,
+    siguienteObra,
+} from '../../resources/js/galeria/intents.js';
 import { reducer } from '../../resources/js/galeria/reducer.js';
-import { estadoInicial, tarjetasVisibles } from '../../resources/js/galeria/state.js';
+import { claveFiltros, estadoInicial, parametrosApi, parametrosUrl, tarjetasVisibles } from '../../resources/js/galeria/state.js';
 
 const obras = (n) => Array.from({ length: n }, (_, i) => ({ id: i + 1, name: `Obra ${i + 1}` }));
-const conObras = (n, estilo = 'acuarela') =>
-    reducer(reducer(estadoInicial, seleccionarEstilo(estilo)), obrasCargadas(estilo, obras(n)));
+// Las respuestas de la API llegan con la clave de los filtros con los que se pidieron
+const cargadas = (estado, lista) => reducer(estado, obrasCargadas(claveFiltros(estado), lista));
+const conObras = (n, estilo = 'acuarela') => cargadas(reducer(estadoInicial, seleccionarEstilo(estilo)), obras(n));
 
 describe('reducer de la galería', () => {
     it('al elegir un estilo vacía las obras y marca que está cargando', () => {
@@ -24,15 +33,17 @@ describe('reducer de la galería', () => {
 
     it('descarta la respuesta de un estilo que ya no está seleccionado', () => {
         let estado = reducer(estadoInicial, seleccionarEstilo('acuarela'));
+        const claveAntigua = claveFiltros(estado);
         estado = reducer(estado, seleccionarEstilo('oleo'));
-        const despues = reducer(estado, obrasCargadas('acuarela', obras(3)));
+        const despues = reducer(estado, obrasCargadas(claveAntigua, obras(3)));
 
         expect(despues).toBe(estado);
         expect(despues.cargando).toBe(true);
     });
 
     it('guarda el error de carga del estilo actual', () => {
-        const estado = reducer(reducer(estadoInicial, seleccionarEstilo('oleo')), errorCarga('oleo', 'Falló'));
+        const cargando = reducer(estadoInicial, seleccionarEstilo('oleo'));
+        const estado = reducer(cargando, errorCarga(claveFiltros(cargando), 'Falló'));
 
         expect(estado).toMatchObject({ cargando: false, error: 'Falló', obras: [] });
     });
@@ -59,6 +70,38 @@ describe('reducer de la galería', () => {
 
         expect(reducer(estado, { type: 'otra-cosa' })).toBe(estado);
         expect(() => reducer(estado, siguienteObra())).not.toThrow();
+    });
+});
+
+describe('filtros combinados', () => {
+    it('al cambiar el tema o la búsqueda conserva el estilo y vuelve a cargar', () => {
+        let estado = reducer(conObras(3, 'oleo'), seleccionarCategoria('retrato'));
+        expect(estado).toMatchObject({ estilo: 'oleo', categoria: 'retrato', busqueda: '', cargando: true, obras: [] });
+
+        estado = reducer(cargadas(estado, obras(2)), buscar('  gato '));
+        expect(estado).toMatchObject({ estilo: 'oleo', categoria: 'retrato', busqueda: 'gato', cargando: true });
+    });
+
+    it('buscar el mismo texto (con espacios de más) no cambia nada', () => {
+        const estado = cargadas(reducer(conObras(3), buscar('gato')), obras(1));
+
+        expect(reducer(estado, buscar('gato  '))).toBe(estado);
+    });
+
+    it('descarta la respuesta de una búsqueda anterior', () => {
+        const primera = reducer(conObras(3), buscar('ga'));
+        const segunda = reducer(primera, buscar('gato'));
+
+        expect(reducer(segunda, obrasCargadas(claveFiltros(primera), obras(5)))).toBe(segunda);
+        expect(cargadas(segunda, obras(1)).obras).toHaveLength(1);
+    });
+
+    it('arma los parámetros de la API y de la URL sin los filtros vacíos', () => {
+        const filtros = { estilo: 'oleo', categoria: '', busqueda: 'gato & perro' };
+
+        expect(parametrosApi(filtros)).toBe('style=oleo&q=gato+%26+perro');
+        expect(parametrosUrl({ ...filtros, categoria: 'retrato' })).toBe('estilo=oleo&categoria=retrato&q=gato+%26+perro');
+        expect(parametrosUrl(estadoInicial)).toBe('');
     });
 });
 

@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@use('App\Enums\Category')
 @use('App\Enums\Style')
 @section('title', "Galería de obras · Nando's Art")
 @section('description', 'Galería de Nando\'s Art: obras originales en acuarela, óleo, rotulador y más, ordenadas por estilo. Entra en cada una para ver la ficha y el precio.')
@@ -21,6 +22,25 @@
             </button>
         @endforeach
     </div>
+
+    <!-- Tema y búsqueda: sin JavaScript, el formulario recarga la página con los filtros en la URL -->
+    <form method="GET" action="{{ route('galeria') }}" class="flex flex-wrap justify-center items-end gap-3 mb-4" role="search">
+        <input type="hidden" name="estilo" value="{{ $estilo->value }}">
+        <div>
+            <label for="filtro-categoria" class="block text-sm font-semibold text-gray-700 mb-1">Tema</label>
+            <select id="filtro-categoria" name="categoria" class="px-3 py-2 border border-gray-300 rounded-md bg-white">
+                <option value="">Todos</option>
+                @foreach(Category::cases() as $category)
+                    <option value="{{ $category->value }}" @selected($categoria === $category)>{{ $category->label() }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label for="filtro-busqueda" class="block text-sm font-semibold text-gray-700 mb-1">Buscar</label>
+            <input id="filtro-busqueda" type="search" name="q" value="{{ $busqueda }}" maxlength="100"
+                   placeholder="Nombre o descripción" class="px-3 py-2 border border-gray-300 rounded-md bg-white">
+        </div>
+    </form>
 
     <!-- Carrusel: lo pinta resources/js/galeria (MVI) -->
     <div class="relative w-full max-w-6xl rounded-xl px-10 py-6 overflow-hidden">
@@ -52,7 +72,9 @@
 {{-- Datos que necesita la galería; los colores salen del enum App\Enums\Style --}}
 @php
     $config = [
-        'estiloInicial' => Style::Acuarela->value,
+        'estiloInicial' => $estilo->value,
+        'categoriaInicial' => $categoria?->value ?? '',
+        'busquedaInicial' => $busqueda,
         'fondos' => collect(Style::cases())->mapWithKeys(fn ($s) => [$s->value => $s->background()]),
         'coloresBoton' => collect(Style::cases())->mapWithKeys(fn ($s) => [$s->value => $s->buttonClasses()]),
     ];
