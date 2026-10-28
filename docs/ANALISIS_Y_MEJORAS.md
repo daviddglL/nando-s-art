@@ -336,7 +336,7 @@ Leyenda: ✅ hecho · 🟡 a medias · ❌ pendiente.
 - El layout tiene `charset`, `viewport`, `csrf-token` y `<title>` (punto 1.6).
 - La galería muestra "Todavía no hay obras de este estilo" en vez de romperse con un estilo vacío.
 
-**Tests:** 11 tests nuevos en `tests/Feature/Fase1SeguridadTest.php`. Pasan 39 tests en total. Los 10 que fallan son los heredados de Breeze/Volt (`tests/Feature/Auth`, `ProfileTest`), igual que antes; se resolverán en la fase 2 al quedarse con un solo sistema de login.
+**Tests:** 10 tests nuevos en `tests/Feature/Fase1SeguridadTest.php`. Pasan 39 tests en total. Los 10 que fallan son los heredados de Breeze/Volt (`tests/Feature/Auth`, `ProfileTest`), igual que antes; se resolverán en la fase 2 al quedarse con un solo sistema de login.
 
 **Importante para producción:** las imágenes nuevas se guardan en `storage/app/public/obras`, así que el servidor necesita `php artisan storage:link` (lo mismo que ya pedían las imágenes de presupuestos).
 
