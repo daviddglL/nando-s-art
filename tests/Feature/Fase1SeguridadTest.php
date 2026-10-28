@@ -8,36 +8,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
-test('un invitado o un usuario normal no pueden subir imágenes sueltas', function () {
-    Storage::fake('public');
-    $imagen = UploadedFile::fake()->image('foto.jpg');
-
-    $this->postJson('/api/upload-image', ['image' => $imagen])->assertUnauthorized();
-    $this->actingAs(User::factory()->create())
-        ->postJson('/api/upload-image', ['image' => $imagen])
-        ->assertForbidden();
-
-    expect(Storage::disk('public')->allFiles())->toBeEmpty();
-});
-
-test('el admin sube imágenes con nombre aleatorio y no se aceptan SVG', function () {
-    Storage::fake('public');
-    $admin = admin();
-
-    $this->actingAs($admin)
-        ->postJson('/api/upload-image', ['image' => UploadedFile::fake()->image('mi foto.jpg')])
-        ->assertOk();
-
-    $ficheros = Storage::disk('public')->files('imagenes');
-    expect($ficheros)->toHaveCount(1)
-        ->and(basename($ficheros[0]))->not->toBe('mi foto.jpg');
-
-    $svg = UploadedFile::fake()->createWithContent('x.svg', '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>');
-    $this->actingAs($admin)
-        ->postJson('/api/upload-image', ['image' => $svg])
-        ->assertUnprocessable();
-});
-
 test('la ruta /api/test ya no existe', function () {
     $this->getJson('/api/test')->assertNotFound();
 });

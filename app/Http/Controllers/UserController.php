@@ -16,7 +16,7 @@ class UserController extends Controller
     {
         Gate::authorize('viewAny', User::class);
 
-        return User::all();
+        return User::orderBy('id')->paginate(20);
     }
 
     public function store(Request $request)

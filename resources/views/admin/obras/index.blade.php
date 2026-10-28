@@ -75,16 +75,25 @@
     <div class="mt-4">{{ $obras->links() }}</div>
 
     @if ($papelera->isNotEmpty())
-        <h2 class="text-xl font-bold text-gray-800 mt-10 mb-3">Papelera</h2>
+        <h2 class="text-xl font-bold text-gray-800 mt-10 mb-1">Papelera</h2>
+        <p class="text-gray-600 mb-3">Las obras se eliminan solas, con su imagen, a los {{ \App\Models\Product::DIAS_PAPELERA }} días.</p>
         <ul class="bg-white rounded-2xl shadow-lg divide-y">
             @foreach ($papelera as $obra)
                 <li class="flex flex-wrap justify-between items-center gap-2 p-3">
                     <span class="text-gray-700">{{ $obra->name }} <span class="text-sm text-gray-500">(borrada el {{ $obra->deleted_at->format('d/m/Y') }})</span></span>
-                    <form method="POST" action="{{ route('admin.obras.restore', $obra) }}">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="bg-green-100 text-gray-700 px-3 py-1 rounded-sm hover:bg-green-200">Restaurar</button>
-                    </form>
+                    <div class="flex gap-2">
+                        <form method="POST" action="{{ route('admin.obras.restore', $obra) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="bg-green-100 text-gray-700 px-3 py-1 rounded-sm hover:bg-green-200">Restaurar</button>
+                        </form>
+                        <form method="POST" action="{{ route('admin.obras.force-destroy', $obra) }}"
+                              data-confirmar="¿Eliminar «{{ $obra->name }}» para siempre? También se borra su imagen y no se puede deshacer.">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-red-100 text-red-800 px-3 py-1 rounded-sm hover:bg-red-200">Eliminar definitivamente</button>
+                        </form>
+                    </div>
                 </li>
             @endforeach
         </ul>

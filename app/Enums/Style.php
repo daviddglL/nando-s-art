@@ -39,16 +39,16 @@ enum Style: string
         };
     }
 
-    // Clases del botón de filtro cuando está activo
+    // Clases del botón de filtro cuando está activo: un tono oscuro que destaca sobre el fondo pastel del estilo
     public function buttonClasses(): string
     {
         return match ($this) {
-            self::Acuarela => 'bg-blue-100 text-blue-900 hover:bg-blue-200',
-            self::Rotulador => 'bg-yellow-100 text-yellow-900 hover:bg-yellow-200',
-            self::Oleo => 'bg-pink-100 text-pink-900 hover:bg-pink-200',
-            self::Sketch => 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-            self::Papel => 'bg-green-100 text-green-900 hover:bg-green-200',
-            self::Lienzo => 'bg-purple-100 text-purple-900 hover:bg-purple-200',
+            self::Acuarela => 'bg-blue-700 text-white hover:bg-blue-800',
+            self::Rotulador => 'bg-yellow-800 text-white hover:bg-yellow-900',
+            self::Oleo => 'bg-pink-700 text-white hover:bg-pink-800',
+            self::Sketch => 'bg-gray-700 text-white hover:bg-gray-800',
+            self::Papel => 'bg-green-700 text-white hover:bg-green-800',
+            self::Lienzo => 'bg-purple-700 text-white hover:bg-purple-800',
         };
     }
 

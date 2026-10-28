@@ -22,42 +22,42 @@
         @endif
 
         <div>
-            <label class="block text-gray-700 font-semibold mb-1">Descripción</label>
-            <textarea name="description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-md">{{ old('description') }}</textarea>
+            <label for="encargo-description" class="block text-gray-700 font-semibold mb-1">Descripción</label>
+            <textarea id="encargo-description" name="description" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-md">{{ old('description', $descripcion) }}</textarea>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Altura (cm)</label>
-                <input type="number" name="height" step="0.01" min="0" value="{{ old('height') }}" required class="w-full px-4 py-2 border rounded-md">
+                <label for="encargo-height" class="block text-gray-700 font-semibold mb-1">Altura (cm)</label>
+                <input type="number" id="encargo-height" name="height" step="0.01" min="0" value="{{ old('height') }}" required class="w-full px-4 py-2 border rounded-md">
             </div>
             <div>
-                <label class="block text-gray-700 font-semibold mb-1">Ancho (cm)</label>
-                <input type="number" name="width" step="0.01" min="0" value="{{ old('width') }}" required class="w-full px-4 py-2 border rounded-md">
+                <label for="encargo-width" class="block text-gray-700 font-semibold mb-1">Ancho (cm)</label>
+                <input type="number" id="encargo-width" name="width" step="0.01" min="0" value="{{ old('width') }}" required class="w-full px-4 py-2 border rounded-md">
             </div>
         </div>
 
         <div>
-            <label class="block text-gray-700 font-semibold mb-1">Estilo</label>
-            <select name="style" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+            <label for="encargo-style" class="block text-gray-700 font-semibold mb-1">Estilo</label>
+            <select id="encargo-style" name="style" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
                 @foreach (Style::cases() as $style)
-                    <option value="{{ $style->value }}" @selected(old('style') === $style->value)>{{ $style->label() }}</option>
+                    <option value="{{ $style->value }}" @selected(old('style', $estilo) === $style->value)>{{ $style->label() }}</option>
                 @endforeach
             </select>
         </div>
 
         <div>
-            <label class="block text-gray-700 font-semibold mb-1">Categoría</label>
-            <select name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+            <label for="encargo-category" class="block text-gray-700 font-semibold mb-1">Categoría</label>
+            <select id="encargo-category" name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
                 @foreach (Category::cases() as $category)
-                    <option value="{{ $category->value }}" @selected(old('category') === $category->value)>{{ $category->label() }}</option>
+                    <option value="{{ $category->value }}" @selected(old('category', $categoria) === $category->value)>{{ $category->label() }}</option>
                 @endforeach
             </select>
         </div>
 
         <div>
-            <label class="block text-gray-700 font-semibold mb-1">Imagen (opcional)</label>
-            <input type="file" name="imagen" accept="image/jpeg,image/png,image/gif,image/webp" class="block w-full text-sm text-gray-600">
+            <label for="encargo-imagen" class="block text-gray-700 font-semibold mb-1">Imagen (opcional)</label>
+            <input type="file" id="encargo-imagen" name="imagen" accept="image/jpeg,image/png,image/gif,image/webp" class="block w-full text-sm text-gray-600">
         </div>
 
         <div class="text-center">

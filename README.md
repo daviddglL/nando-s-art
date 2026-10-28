@@ -89,7 +89,13 @@ user=www-data
 stopwaitsecs=60
 ```
 
-**Cabeceras de seguridad.** Las pone la propia aplicación (`App\Http\Middleware\CabecerasSeguridad`): `Content-Security-Policy` (solo scripts propios, sin JS en línea), `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` y, por HTTPS, `Strict-Transport-Security`. Si se añade un script o una imagen de otro dominio, hay que permitirlo en la CSP de ese middleware. Detrás de un proxy o balanceador con HTTPS, configura los proxies de confianza para que Laravel sepa que la petición es segura.
+**Tareas programadas.** La papelera de obras se vacía sola cada noche (`model:prune` borra, con su imagen, las obras que llevan más de 30 días en ella). Para eso el servidor necesita la entrada de cron de Laravel (`crontab -e -u www-data`):
+
+```cron
+* * * * * cd /ruta/a/nandos-art && php artisan schedule:run >> /dev/null 2>&1
+```
+
+**Cabeceras de seguridad y límites.** La API (`/api/*`) admite 60 peticiones por minuto por usuario o IP. Las cabeceras las pone la propia aplicación (`App\Http\Middleware\CabecerasSeguridad`): `Content-Security-Policy` (solo scripts propios, sin JS en línea), `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` y, por HTTPS, `Strict-Transport-Security`. Si se añade un script o una imagen de otro dominio, hay que permitirlo en la CSP de ese middleware. Detrás de un proxy o balanceador con HTTPS, configura los proxies de confianza para que Laravel sepa que la petición es segura.
 
 **Copias de seguridad.** Hay que guardar la base de datos y `storage/app` (las imágenes de las obras están en `storage/app/public` y las de los presupuestos, privadas, en `storage/app/private`). Por ejemplo, cada noche con cron:
 
@@ -103,9 +109,9 @@ Y copia `/backups` fuera del servidor.
 
 ## Qué puede hacer cada uno
 
-- **Visitantes**: galería por estilos, ficha de cada obra en `/obras/{slug}` (con imagen a pantalla completa) y `sitemap.xml`.
+- **Visitantes**: galería por estilo, tema y búsqueda (la URL guarda el filtro, p. ej. `/galeria?estilo=oleo&categoria=retrato`), ficha de cada obra en `/obras/{slug}` (con imagen a pantalla completa) y `sitemap.xml`.
 - **Clientes**: pedir presupuestos (con imagen de referencia, que es privada: solo la ven el cliente y el admin) y ver en "Mis presupuestos" el estado, la respuesta y el precio.
-- **Admin** (`/admin`): crear, editar, ordenar, borrar (papelera) y restaurar obras en `/admin/obras`; responder presupuestos y cambiar su estado en `/admin/encargos`.
+- **Admin** (`/admin`): crear, editar, ordenar, borrar (papelera), restaurar y eliminar definitivamente obras en `/admin/obras`; responder presupuestos y cambiar su estado en `/admin/encargos`.
 
 ## Arquitectura (MVI)
 

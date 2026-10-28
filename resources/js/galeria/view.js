@@ -86,9 +86,10 @@ export function render(estado, dom, config) {
 
     const tarjetas = tarjetasVisibles(estado);
     if (tarjetas.length === 0) {
-        dom.carrusel.replaceChildren(
-            crearElemento('p', 'w-full text-center text-gray-600 py-12', 'Todavía no hay obras de este estilo.'),
-        );
+        const aviso = estado.categoria || estado.busqueda
+            ? 'No hay obras que cumplan estos filtros.'
+            : 'Todavía no hay obras de este estilo.';
+        dom.carrusel.replaceChildren(crearElemento('p', 'w-full text-center text-gray-600 py-12', aviso));
         return;
     }
 

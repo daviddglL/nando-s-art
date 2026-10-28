@@ -8,6 +8,7 @@ use App\Enums\EstadoEncargo;
 use App\Http\Requests\StoreEncargoRequest;
 use App\Http\Requests\UpdateEncargoRequest;
 use App\Models\Encargo;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -55,11 +56,18 @@ class EncargoController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         Gate::authorize('create', Encargo::class);
 
-        return view('encargos.create');
+        // Desde la ficha de una obra (/presupuesto?obra=slug) el formulario sale con su estilo y su tema
+        $obra = Product::where('slug', (string) $request->query('obra'))->first();
+
+        return view('encargos.create', [
+            'estilo' => $obra?->style->value,
+            'categoria' => $obra?->category->value,
+            'descripcion' => $obra ? "Me gustaría una obra parecida a «{$obra->name}»." : null,
+        ]);
     }
 
     public function store(StoreEncargoRequest $request, SolicitarPresupuesto $solicitar)

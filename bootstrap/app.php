@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // CSP, X-Frame-Options, Referrer-Policy, HSTS… en todas las respuestas
         $middleware->append(CabecerasSeguridad::class);
+
+        // Límite de peticiones en toda la API (el limitador 'api' está en AppServiceProvider)
+        $middleware->throttleApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

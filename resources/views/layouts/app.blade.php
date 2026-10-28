@@ -56,6 +56,9 @@
                     </li>
                     @if(Auth::user()->isAdmin())
                         <li>
+                            <a href="{{ route('admin') }}" class="text-blue-500 font-semibold hover:underline">Panel</a>
+                        </li>
+                        <li>
                             <a href="{{ route('admin.obras.index') }}" class="text-blue-500 font-semibold hover:underline">Obras</a>
                         </li>
                         <li>

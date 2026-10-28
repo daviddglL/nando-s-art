@@ -52,6 +52,9 @@ describe('vista de la galería', () => {
         expect(dom.carrusel.textContent).toContain('Todavía no hay obras de este estilo');
         expect(dom.siguiente.disabled).toBe(true);
 
+        render({ ...estadoInicial, estilo: 'oleo', busqueda: 'gato' }, dom, config);
+        expect(dom.carrusel.textContent).toContain('No hay obras que cumplan estos filtros');
+
         render({ ...estadoInicial, estilo: 'oleo', error: 'No se han podido cargar' }, dom, config);
         expect(dom.carrusel.textContent).toContain('No se han podido cargar');
     });

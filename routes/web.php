@@ -79,7 +79,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/galeria/nuevo', [ProductController::class, 'create'])->name('products.create');
     Route::post('/galeria', [ProductController::class, 'store'])->name('products.store');
 
-    // Gestión de obras: listar, editar, ordenar, borrar (a la papelera) y restaurar
+    // Gestión de obras: listar, editar, ordenar, borrar (a la papelera), restaurar y eliminar definitivamente
     Route::get('/admin/obras', [ProductController::class, 'listado'])->name('admin.obras.index');
     Route::get('/admin/obras/{obra}/editar', [ProductController::class, 'edit'])->name('admin.obras.edit');
     Route::put('/admin/obras/{obra}', [ProductController::class, 'update'])->name('admin.obras.update');
@@ -87,6 +87,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('/admin/obras/{obra}/restaurar', [ProductController::class, 'restore'])
         ->withTrashed()
         ->name('admin.obras.restore');
+    Route::delete('/admin/obras/{obra}/definitivo', [ProductController::class, 'forceDestroy'])
+        ->withTrashed()
+        ->name('admin.obras.force-destroy');
     Route::patch('/admin/obras/{obra}/mover', [ProductController::class, 'mover'])->name('admin.obras.mover');
 
     // Gestión de encargos (presupuestos recibidos)

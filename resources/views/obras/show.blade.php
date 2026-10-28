@@ -42,7 +42,8 @@
                 <dd>{{ $obra->precioTexto() }}</dd>
             </dl>
 
-            <a href="{{ route('encargos.create') }}"
+            {{-- El formulario de presupuesto sale ya con el estilo, el tema y el nombre de esta obra --}}
+            <a href="{{ route('encargos.create', ['obra' => $obra->slug]) }}"
                class="inline-block bg-linear-to-r from-blue-200 to-pink-200 text-gray-800 px-5 py-3 rounded-lg shadow-sm font-semibold hover:scale-105 transition">
                 {{ $obra->available && $obra->price === null ? 'Consultar precio' : 'Pedir una obra parecida' }}
             </a>
