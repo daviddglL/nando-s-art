@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\ObraImagen;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -37,6 +38,11 @@ class ProductResource extends JsonResource
             'imagen_url' => $this->imagenUrl(),
             // Miniaturas WebP para que el navegador baje solo el tamaño que necesita (null si no hay)
             'srcset' => $this->srcset(),
+            // Imágenes adicionales, en orden (solo si se han cargado con la obra)
+            'imagenes' => $this->whenLoaded('imagenes', fn () => $this->imagenes->map(fn (ObraImagen $imagen) => [
+                'imagen_url' => $imagen->imagenUrl(),
+                'srcset' => $imagen->srcset(),
+            ])->values()),
             'url' => route('obras.show', $this->slug),
         ];
     }

@@ -4,7 +4,6 @@ namespace App\Actions;
 
 use App\Models\Product;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class UpdateProduct
 {
@@ -28,10 +27,7 @@ class UpdateProduct
         $obra->update($data);
 
         if ($imagen) {
-            if ($anterior->imagen) {
-                Storage::disk('public')->delete('obras/'.$anterior->imagen);
-                $anterior->borrarMiniaturas();
-            }
+            $anterior->borrarImagen();
             $this->miniaturas->handle($obra);
         }
 

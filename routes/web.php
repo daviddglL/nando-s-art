@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EncargoController;
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\ObraController;
+use App\Http\Controllers\ObraImagenController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SitemapController;
@@ -91,6 +92,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->withTrashed()
         ->name('admin.obras.force-destroy');
     Route::patch('/admin/obras/{obra}/mover', [ProductController::class, 'mover'])->name('admin.obras.mover');
+
+    // Imágenes adicionales de cada obra: subir varias, ordenarlas, elegir la principal y borrarlas
+    Route::post('/admin/obras/{obra}/imagenes', [ObraImagenController::class, 'store'])->name('admin.obras.imagenes.store');
+    Route::patch('/admin/obras/{obra}/imagenes/{imagen}/mover', [ObraImagenController::class, 'mover'])->name('admin.obras.imagenes.mover');
+    Route::patch('/admin/obras/{obra}/imagenes/{imagen}/principal', [ObraImagenController::class, 'principal'])->name('admin.obras.imagenes.principal');
+    Route::delete('/admin/obras/{obra}/imagenes/{imagen}', [ObraImagenController::class, 'destroy'])->name('admin.obras.imagenes.destroy');
 
     // Gestión de encargos (presupuestos recibidos)
     Route::get('/admin/encargos', [EncargoController::class, 'index'])->name('encargos.index');

@@ -27,6 +27,8 @@ Los estilos ya no vienen de un CDN: si no se ejecuta `npm run build` (o `npm run
 
 Al subir o cambiar la imagen de una obra se generan versiones WebP de 400, 800 y 1600 px de ancho en `storage/app/public/obras/miniaturas/` (nunca más anchas que la original). La galería, la ficha y el admin las usan con `srcset`, así que el móvil descarga la pequeña; el lightbox sigue abriendo la original.
 
+Cada obra tiene una imagen principal (la de la galería) y hasta 12 adicionales (detalles, otros ángulos...), que se suben, ordenan, borran o se convierten en la principal en la sección "Más imágenes" de su pantalla de edición. Salen en la ficha como miniaturas y en el visor, que pasa de una a otra con flechas, teclado o deslizando el dedo. Tienen sus propias miniaturas WebP y se borran con la obra al eliminarla definitivamente.
+
 Para las obras que ya existían (o si se borra esa carpeta):
 
 ```bash
@@ -109,9 +111,9 @@ Y copia `/backups` fuera del servidor.
 
 ## Qué puede hacer cada uno
 
-- **Visitantes**: galería por estilo, tema y búsqueda (la URL guarda el filtro, p. ej. `/galeria?estilo=oleo&categoria=retrato`), ficha de cada obra en `/obras/{slug}` (con imagen a pantalla completa) y `sitemap.xml`.
+- **Visitantes**: galería por estilo, tema y búsqueda (la URL guarda el filtro, p. ej. `/galeria?estilo=oleo&categoria=retrato`), ficha de cada obra en `/obras/{slug}` (con todas sus imágenes a pantalla completa) y `sitemap.xml`.
 - **Clientes**: pedir presupuestos (con imagen de referencia, que es privada: solo la ven el cliente y el admin) y ver en "Mis presupuestos" el estado, la respuesta y el precio.
-- **Admin** (`/admin`): crear, editar, ordenar, borrar (papelera), restaurar y eliminar definitivamente obras en `/admin/obras`; responder presupuestos y cambiar su estado en `/admin/encargos`.
+- **Admin** (`/admin`): crear, editar, ordenar, borrar (papelera), restaurar y eliminar definitivamente obras en `/admin/obras`, cada una con varias imágenes; responder presupuestos y cambiar su estado en `/admin/encargos`.
 
 ## Arquitectura (MVI)
 

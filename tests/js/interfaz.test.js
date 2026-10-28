@@ -61,6 +61,63 @@ describe('lightbox', () => {
     });
 });
 
+describe('lightbox con varias imágenes', () => {
+    let dialogo;
+    const visibles = () => [...dialogo.querySelectorAll('[data-lightbox-imagen]')].filter((img) => !img.hidden).map((img) => img.alt);
+    const contador = () => dialogo.querySelector('[data-lightbox-contador]').textContent;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <button data-lightbox-abrir="visor" data-lightbox-indice="0">Principal</button>
+            <button data-lightbox-abrir="visor" data-lightbox-indice="2">Tercera</button>
+            <dialog id="visor">
+                <img data-lightbox-imagen alt="1"><img data-lightbox-imagen alt="2" hidden><img data-lightbox-imagen alt="3" hidden>
+                <button data-lightbox-anterior>‹</button><button data-lightbox-siguiente>›</button>
+                <p data-lightbox-contador></p>
+            </dialog>`;
+        dialogo = document.getElementById('visor');
+        dialogo.showModal = vi.fn();
+        dialogo.close = vi.fn();
+        iniciarLightbox();
+    });
+
+    it('cada miniatura abre el visor en su imagen', () => {
+        document.querySelectorAll('[data-lightbox-abrir]')[1].click();
+        expect(visibles()).toEqual(['3']);
+        expect(contador()).toBe('3 / 3');
+        expect(dialogo.showModal).toHaveBeenCalledOnce();
+    });
+
+    it('las flechas pasan de imagen dando la vuelta, sin cerrar el visor', () => {
+        document.querySelector('[data-lightbox-abrir]').click();
+
+        dialogo.querySelector('[data-lightbox-siguiente]').click();
+        expect(visibles()).toEqual(['2']);
+        dialogo.querySelector('[data-lightbox-anterior]').click();
+        dialogo.querySelector('[data-lightbox-anterior]').click();
+        expect(visibles()).toEqual(['3']);
+        expect(dialogo.close).not.toHaveBeenCalled();
+    });
+
+    it('también con las flechas del teclado y deslizando el dedo', () => {
+        document.querySelector('[data-lightbox-abrir]').click();
+
+        dialogo.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+        expect(contador()).toBe('2 / 3');
+        dialogo.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+        expect(contador()).toBe('1 / 3');
+
+        const toque = (tipo, x) => {
+            const evento = new Event(tipo);
+            evento.changedTouches = [{ clientX: x, clientY: 0 }];
+            dialogo.dispatchEvent(evento);
+        };
+        toque('touchstart', 300);
+        toque('touchend', 100);
+        expect(visibles()).toEqual(['2']);
+    });
+});
+
 describe('confirmación de formularios (sin JS en línea, por la CSP)', () => {
     beforeEach(() => {
         document.body.innerHTML = `

@@ -31,6 +31,7 @@ class ProductController extends Controller
         ]);
 
         $consulta = Product::query()
+            ->with('imagenes')
             ->when($filtros['style'] ?? null, fn ($query, $style) => $query->where('style', $style))
             ->when($filtros['category'] ?? null, fn ($query, $category) => $query->where('category', $category))
             ->ordenadas();
@@ -55,7 +56,7 @@ class ProductController extends Controller
 
     public function show(Product $product): ProductResource
     {
-        return new ProductResource($product);
+        return new ProductResource($product->load('imagenes'));
     }
 
     // --- Panel del admin ---
@@ -87,6 +88,7 @@ class ProductController extends Controller
     public function edit(Product $obra)
     {
         Gate::authorize('update', $obra);
+        $obra->load('imagenes');
 
         return view('admin.obras.edit', compact('obra'));
     }
