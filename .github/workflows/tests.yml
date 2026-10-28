@@ -5,6 +5,8 @@ on:
     branches:
       - master
   pull_request:
+  # Para lanzarlo a mano desde la pestaña Actions (un "startup_failure" no se puede reintentar)
+  workflow_dispatch:
 
 permissions:
   contents: read

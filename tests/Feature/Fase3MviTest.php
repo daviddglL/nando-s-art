@@ -86,7 +86,7 @@ test('la dirección antigua de presupuestos redirige a la nueva', function () {
 });
 
 test('el encargo es del cliente aunque el formulario envíe otro user_id', function () {
-    Storage::fake('public');
+    Storage::fake('local');
     $cliente = User::factory()->create();
     $otro = User::factory()->create();
 
@@ -100,7 +100,7 @@ test('el encargo es del cliente aunque el formulario envíe otro user_id', funct
     $encargo = Encargo::sole();
     expect($encargo->user_id)->toBe($cliente->id)
         ->and($encargo->status)->toBe(EstadoEncargo::Pending);
-    Storage::disk('public')->assertExists($encargo->imagen);
+    Storage::disk('local')->assertExists($encargo->imagen);
 });
 
 test('la acción SolicitarPresupuesto funciona sin imagen', function () {

@@ -301,7 +301,7 @@ test('el cliente ve la respuesta a su presupuesto pero no los de otros', functio
 });
 
 test('la imagen de referencia del presupuesto se guarda y se ve en el detalle', function () {
-    Storage::fake('public');
+    Storage::fake('local');
     Notification::fake();
     $cliente = User::factory()->create();
 
@@ -311,7 +311,7 @@ test('la imagen de referencia del presupuesto se guarda y se ve en el detalle', 
     ]);
 
     $encargo = Encargo::sole();
-    Storage::disk('public')->assertExists($encargo->imagen);
+    Storage::disk('local')->assertExists($encargo->imagen);
     $this->actingAs($cliente)->get("/presupuestos/{$encargo->id}")->assertSee($encargo->imagenUrl(), false);
 });
 

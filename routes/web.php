@@ -66,6 +66,7 @@ Route::middleware('auth')->group(function () {
         ->name('encargos.store');
     // Cada cliente ve el detalle de los suyos (EncargoPolicy)
     Route::get('/presupuestos/{encargo}', [EncargoController::class, 'show'])->name('encargos.show');
+    Route::get('/presupuestos/{encargo}/imagen', [EncargoController::class, 'imagen'])->name('encargos.imagen');
 });
 
 // Rutas solo para admin
