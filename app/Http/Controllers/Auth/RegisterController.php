@@ -38,6 +38,8 @@ class RegisterController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+        // Límite de cuentas nuevas por IP (RateLimiter 'registro' en AppServiceProvider)
+        $this->middleware('throttle:registro')->only('register');
     }
 
     /**
@@ -51,6 +53,10 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            // Campo trampa (honeypot): está oculto, así que solo lo rellenan los bots
+            'web' => ['prohibited'],
+        ], [
+            'web.prohibited' => 'No se ha podido crear la cuenta.',
         ]);
     }
 

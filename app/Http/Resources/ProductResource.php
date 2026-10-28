@@ -35,6 +35,8 @@ class ProductResource extends JsonResource
             'category' => $this->category->value,
             'category_label' => $this->category->label(),
             'imagen_url' => $this->imagenUrl(),
+            // Miniaturas WebP para que el navegador baje solo el tamaño que necesita (null si no hay)
+            'srcset' => $this->srcset(),
             'url' => route('obras.show', $this->slug),
         ];
     }

@@ -7,8 +7,10 @@ use Illuminate\Http\UploadedFile;
 
 class CreateProduct
 {
+    public function __construct(private GenerarMiniaturas $miniaturas) {}
+
     /**
-     * Guarda la imagen y crea la obra.
+     * Guarda la imagen, crea la obra y genera sus miniaturas WebP.
      *
      * @param  array<string, mixed>  $data  datos ya validados por StoreProductRequest
      */
@@ -18,6 +20,9 @@ class CreateProduct
         // Se guarda en storage/app/public/obras (visible en /storage/obras con `php artisan storage:link`)
         $data['imagen'] = basename((string) $imagen->store('obras', 'public'));
 
-        return Product::create($data);
+        $obra = Product::create($data);
+        $this->miniaturas->handle($obra);
+
+        return $obra;
     }
 }

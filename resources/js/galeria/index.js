@@ -3,6 +3,7 @@ import { anteriorObra, seleccionarEstilo, siguienteObra } from './intents.js';
 import { reducer } from './reducer.js';
 import { estadoInicial } from './state.js';
 import { crearStore } from './store.js';
+import { escucharSwipe } from './swipe.js';
 import { render } from './view.js';
 
 // Punto de entrada: conecta los botones de la vista con dispatch() y pinta cada estado nuevo
@@ -35,6 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (evento.target.closest?.('input, textarea, select')) return;
         if (evento.key === 'ArrowLeft') store.dispatch(anteriorObra());
         if (evento.key === 'ArrowRight') store.dispatch(siguienteObra());
+    });
+
+    // En móvil también se pasa de obra deslizando el dedo sobre el carrusel
+    escucharSwipe(dom.carrusel, (direccion) => {
+        store.dispatch(direccion === 'siguiente' ? siguienteObra() : anteriorObra());
     });
 
     store.dispatch(seleccionarEstilo(config.estiloInicial));

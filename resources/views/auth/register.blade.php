@@ -41,7 +41,12 @@
                     class="mt-1 w-full px-4 py-2 border rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500">
             </div>
 
-        
+            {{-- Campo trampa para bots: invisible y fuera del orden de tabulación --}}
+            <div class="hidden" aria-hidden="true">
+                <label for="web">Deja este campo vacío</label>
+                <input id="web" type="text" name="web" value="" tabindex="-1" autocomplete="off">
+            </div>
+            @error('web') <p class="col-span-2 text-red-500 text-sm">{{ $message }}</p> @enderror
 
             <!-- Botón de registro -->
             <div class="col-span-2">

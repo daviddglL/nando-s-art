@@ -39,7 +39,7 @@
                         </td>
                         <td class="py-2 px-3">
                             <div class="flex items-center gap-3">
-                                <img src="{{ $obra->imagenUrl() }}" alt="" loading="lazy" class="w-14 h-14 object-cover rounded-sm">
+                                <img src="{{ $obra->miniaturaUrl() }}" alt="" loading="lazy" class="w-14 h-14 object-cover rounded-sm">
                                 <a href="{{ route('obras.show', $obra->slug) }}" class="font-semibold text-gray-800 hover:underline">{{ $obra->name }}</a>
                             </div>
                         </td>
@@ -56,7 +56,7 @@
                         <td class="py-2 px-3 text-right whitespace-nowrap">
                             <a href="{{ route('admin.obras.edit', $obra) }}" class="inline-block bg-blue-100 text-gray-700 px-3 py-1 rounded-sm hover:bg-blue-200">Editar</a>
                             <form method="POST" action="{{ route('admin.obras.destroy', $obra) }}" class="inline"
-                                  onsubmit="return confirm('¿Enviar esta obra a la papelera?')">
+                                  data-confirmar="¿Enviar esta obra a la papelera?">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-pink-100 text-gray-700 px-3 py-1 rounded-sm hover:bg-pink-200">Borrar</button>

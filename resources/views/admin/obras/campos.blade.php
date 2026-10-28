@@ -79,7 +79,7 @@
         {{ $obra ? 'Cambiar imagen (opcional)' : 'Imagen' }}
     </label>
     @if ($obra)
-        <img src="{{ $obra->imagenUrl() }}" alt="Imagen actual de {{ $obra->name }}" class="w-32 h-32 object-cover rounded-sm mb-2">
+        <img src="{{ $obra->miniaturaUrl() }}" alt="Imagen actual de {{ $obra->name }}" class="w-32 h-32 object-cover rounded-sm mb-2">
     @endif
     <input id="imagen" type="file" name="imagen" accept="image/jpeg,image/png,image/gif,image/webp" @required(! $obra)
            class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700">

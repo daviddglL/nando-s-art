@@ -69,6 +69,18 @@ describe('vista de la galería', () => {
         expect(dom.siguiente.disabled).toBe(false);
     });
 
+    it('usa las miniaturas WebP (srcset) cuando la obra las tiene', () => {
+        const srcset = '/storage/obras/miniaturas/1/400.webp 400w, /storage/obras/miniaturas/1/800.webp 800w';
+        render({ ...estadoInicial, estilo: 'acuarela', obras: [obra(1, { srcset }), obra(2, { srcset: null })], indice: 0 }, dom, config);
+
+        const conMiniaturas = dom.carrusel.querySelector('img[alt="Obra 1"]');
+        const sinMiniaturas = dom.carrusel.querySelector('img[alt="Obra 2"]');
+        expect(conMiniaturas.getAttribute('srcset')).toBe(srcset);
+        expect(conMiniaturas.getAttribute('sizes')).toBe('272px');
+        expect(sinMiniaturas.hasAttribute('srcset')).toBe(false);
+        expect(sinMiniaturas.getAttribute('src')).toBe('/storage/obras/2.webp');
+    });
+
     it('añade un hueco invisible cuando hay un número par de tarjetas', () => {
         const obras = [1, 2].map((id) => obra(id));
         render({ ...estadoInicial, estilo: 'acuarela', obras, indice: 1 }, dom, config);
