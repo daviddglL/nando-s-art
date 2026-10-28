@@ -42,6 +42,12 @@
                 <li>
                     <a href="{{ route('galeria') }}" class="text-blue-500 font-semibold hover:underline">Galería</a>
                 </li>
+                <li>
+                    <a href="{{ route('paginas.sobre-mi') }}" class="text-gray-700 hover:text-blue-500 font-medium">Sobre mí</a>
+                </li>
+                <li>
+                    <a href="{{ route('paginas.contacto') }}" class="text-gray-700 hover:text-blue-500 font-medium">Contacto</a>
+                </li>
                 @guest
                     <li>
                         <a href="{{ route('login') }}" class="text-blue-500 font-semibold hover:underline">Iniciar Sesión</a>
@@ -60,6 +66,9 @@
                         </li>
                         <li>
                             <a href="{{ route('admin.obras.index') }}" class="text-blue-500 font-semibold hover:underline">Obras</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.paginas.index') }}" class="text-blue-500 font-semibold hover:underline">Páginas</a>
                         </li>
                         <li>
                             <a href="{{ route('encargos.index') }}" class="text-blue-500 font-semibold hover:underline">

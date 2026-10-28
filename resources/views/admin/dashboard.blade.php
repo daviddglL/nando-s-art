@@ -23,5 +23,8 @@
     <a href="{{ route('products.create') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm">
         + Nueva obra
     </a>
+    <a href="{{ route('admin.paginas.index') }}" class="inline-block ml-2 py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 font-bold shadow-sm">
+        Editar «Sobre mí» y «Contacto»
+    </a>
 </div>
 @endsection

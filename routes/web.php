@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EncargoController;
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\ObraController;
+use App\Http\Controllers\PaginaController;
 use App\Http\Controllers\PortadaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -23,6 +24,10 @@ Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria');
 
 // Ficha pública de cada obra, con URL para compartir
 Route::get('/obras/{obra:slug}', [ObraController::class, 'show'])->name('obras.show');
+
+// Páginas de texto que el artista edita desde el panel
+Route::get('/sobre-mi', [PaginaController::class, 'sobreMi'])->name('paginas.sobre-mi');
+Route::get('/contacto', [PaginaController::class, 'contacto'])->name('paginas.contacto');
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
@@ -99,4 +104,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::patch('/admin/encargos/{encargo}', [EncargoController::class, 'update'])->name('encargos.update');
     Route::delete('/admin/encargos/{encargo}', [EncargoController::class, 'destroy'])->name('encargos.destroy');
     Route::permanentRedirect('/admin/shipments', '/admin/encargos');
+
+    // Textos de "Sobre mí" y "Contacto"
+    Route::get('/admin/paginas', [PaginaController::class, 'index'])->name('admin.paginas.index');
+    Route::get('/admin/paginas/{pagina}/editar', [PaginaController::class, 'edit'])->name('admin.paginas.edit');
+    Route::put('/admin/paginas/{pagina}', [PaginaController::class, 'update'])->name('admin.paginas.update');
 });
