@@ -1,6 +1,6 @@
 # Nando's Art: análisis del proyecto y propuestas de mejora
 
-Fecha del análisis: 28/10/2026. Rama analizada: `main` (último commit `ec3c06f`).
+Fecha del análisis: 28/10/2026. Rama analizada: `master` (último commit `ec3c06f`).
 
 Este documento recoge qué conviene **arreglar**, **actualizar**, **mejorar** y qué **funcionalidades faltan**. Está ordenado por prioridad dentro de cada sección. Las referencias a ficheros usan la forma `ruta:línea`.
 
@@ -207,7 +207,7 @@ Propuesta:
   - Un usuario logueado crea un presupuesto **a su nombre** aunque envíe otro `user_id`.
   - La API de usuarios no es accesible sin autenticación.
 - Tests de JS con **Vitest** para el reducer MVI.
-- CI (`.github/workflows/tests.yml`): hoy solo corre en `master` y `*.x` (la rama es `main`), y no compila assets. Añadir `main`, `npm ci && npm run build`, `pint --test`, `composer audit`.
+- CI (`.github/workflows/tests.yml`): hoy corre en `master`, pero no compila assets ni prepara la base de datos. Añadir `npm ci && npm run build`, `pint --test`, `composer audit`.
 - Borrar los workflows heredados de Laravel (`issues.yml`, `pull-requests.yml`, `update-changelog.yml`) y el `CHANGELOG.md` del esqueleto: no aplican a este proyecto.
 - Análisis estático con **Larastan** (nivel 5 para empezar).
 
