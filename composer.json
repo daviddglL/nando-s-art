@@ -1,25 +1,22 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "daviddgll/nandos-art",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Nando's Art: galería de arte y solicitud de presupuestos de Fernando Delgado.",
     "keywords": [
         "laravel",
-        "framework"
+        "galeria",
+        "arte"
     ],
-    "license": "MIT",
+    "license": "proprietary",
     "require": {
         "php": "^8.2",
-        "doctrine/dbal": "^4.2",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "laravel/ui": "^4.6",
-        "livewire/livewire": "^3.4",
-        "livewire/volt": "^1.7.0"
+        "laravel/ui": "^4.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
-        "laravel/breeze": "^2.3",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.41",

@@ -4,20 +4,11 @@ use App\Models\Product;
 use App\Models\Shipment;
 use App\Models\User;
 
-function crearAdmin(): User
-{
-    $user = User::factory()->create();
-    $user->role = 'admin';
-    $user->save();
-
-    return $user;
-}
-
 test('el admin ve el menú y la lista de presupuestos', function () {
-    $this->actingAs(crearAdmin())
+    $this->actingAs(admin())
         ->get('/admin/shipments')
         ->assertOk()
-        ->assertSee('Ver Shipments');
+        ->assertSee('Presupuestos recibidos');
 });
 
 test('un usuario normal no puede ver la lista de presupuestos', function () {
@@ -52,7 +43,7 @@ test('el admin puede borrar un presupuesto', function () {
         'style' => 'oleo', 'category' => 'otro',
     ]);
 
-    $this->actingAs(crearAdmin())
+    $this->actingAs(admin())
         ->delete("/admin/shipments/{$shipment->id}")
         ->assertRedirect('/admin/shipments');
 

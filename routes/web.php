@@ -1,42 +1,22 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GaleriaController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShipmentController;
+use Illuminate\Http\Client\HttpClientException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\GaleriaController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ShipmentController;
+use Illuminate\Support\Facades\Route;
 
 // Ruta de inicio
-Route::get('/', function () {
-    return view('landing');
-})->name('landing');
-
-// Ruta protegida del dashboard
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
-// Perfil del usuario
-Route::view('/profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
+Route::view('/', 'landing')->name('landing');
 
 // Ruta pública para ver la galería (solo visualización)
 Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria');
-
-// Rutas solo para admin (añadir productos)
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/galeria/nuevo', [ProductController::class, 'create'])->name('products.create');
-    Route::post('/galeria', [ProductController::class, 'store'])->name('products.store');
-
-    // Gestión de presupuestos (shipments)
-    Route::get('/admin/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
-    Route::delete('/admin/shipments/{shipment}', [ShipmentController::class, 'destroy'])->name('shipments.destroy');
-});
 
 // Ruta para obtener frase del día (proxy para evitar CORS).
 // Se cachea hasta medianoche y no deja la página colgada si el servicio externo falla.
@@ -50,7 +30,7 @@ Route::get('/frase-proxy', function () {
                 $frase = $response->json();
                 Cache::put('frase-del-dia', $frase, now()->endOfDay());
             }
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        } catch (HttpClientException $e) {
             report($e);
         }
     }
@@ -60,21 +40,32 @@ Route::get('/frase-proxy', function () {
         : response()->json(['message' => 'No se pudo cargar la frase del día'], 503);
 })->middleware('throttle:60,1');
 
-// Autenticación
-
+// Autenticación (laravel/ui): login, registro, recuperar y confirmar contraseña
 Auth::routes();
 
-// Ruta home (post-login)
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Usuarios con sesión iniciada
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::get('/admin', [AdminController::class, 'index'])->middleware(['auth', 'admin']);
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-Route::middleware(['auth'])->group(function () {
     Route::get('/presupuesto', [ShipmentController::class, 'create'])->name('shipments.create');
     Route::post('/presupuesto', [ShipmentController::class, 'store'])
         ->middleware('throttle:5,1')
         ->name('shipments.store');
-
 });
 
+// Rutas solo para admin
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin');
 
+    Route::get('/galeria/nuevo', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/galeria', [ProductController::class, 'store'])->name('products.store');
+
+    // Gestión de presupuestos (shipments)
+    Route::get('/admin/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
+    Route::delete('/admin/shipments/{shipment}', [ShipmentController::class, 'destroy'])->name('shipments.destroy');
+});

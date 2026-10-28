@@ -1,3 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Clases que se generan desde PHP (colores de cada estilo en App\Enums) */
+@source '../../app/Enums';
+
+/*
+  Compatibilidad con Tailwind 3, que es con el que se diseñó la web:
+  en Tailwind 4 los bordes usan currentColor y los botones no llevan cursor de mano.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
+    }
+}

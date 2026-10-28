@@ -1,15 +1,7 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\User;
-
-function admin(): User
-{
-    $user = User::factory()->create();
-    $user->role = 'admin';
-    $user->save();
-
-    return $user;
-}
 
 test('un invitado no puede acceder a la API de usuarios', function () {
     $user = User::factory()->create();
@@ -18,7 +10,7 @@ test('un invitado no puede acceder a la API de usuarios', function () {
     $this->putJson("/api/users/{$user->id}", ['role' => 'admin'])->assertUnauthorized();
     $this->deleteJson("/api/users/{$user->id}")->assertUnauthorized();
 
-    expect($user->fresh()->role)->toBe('user');
+    expect($user->fresh()->role)->toBe(Role::User);
 });
 
 test('un usuario normal no puede ascenderse a admin', function () {
@@ -28,7 +20,7 @@ test('un usuario normal no puede ascenderse a admin', function () {
         ->putJson("/api/users/{$user->id}", ['role' => 'admin'])
         ->assertForbidden();
 
-    expect($user->fresh()->role)->toBe('user');
+    expect($user->fresh()->role)->toBe(Role::User);
 });
 
 test('un usuario normal no puede editar ni borrar a otros', function () {
@@ -60,7 +52,7 @@ test('un admin puede cambiar roles y borrar usuarios', function () {
 
     $this->actingAs($admin)->getJson('/api/users')->assertOk();
     $this->actingAs($admin)->putJson("/api/users/{$user->id}", ['role' => 'admin'])->assertOk();
-    expect($user->fresh()->role)->toBe('admin');
+    expect($user->fresh()->role)->toBe(Role::Admin);
 
     $this->actingAs($admin)->deleteJson("/api/users/{$user->id}")->assertOk();
     expect(User::find($user->id))->toBeNull();
@@ -72,7 +64,7 @@ test('un admin no puede quitarse el rol ni borrarse a sí mismo', function () {
     $this->actingAs($admin)->putJson("/api/users/{$admin->id}", ['role' => 'user'])->assertForbidden();
     $this->actingAs($admin)->deleteJson("/api/users/{$admin->id}")->assertForbidden();
 
-    expect($admin->fresh()->role)->toBe('admin');
+    expect($admin->fresh()->role)->toBe(Role::Admin);
 });
 
 test('la respuesta nunca incluye la contraseña', function () {

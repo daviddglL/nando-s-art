@@ -1,7 +1,7 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\MiddlewareServiceProvider::class,
-    App\Providers\VoltServiceProvider::class,
+    AppServiceProvider::class,
 ];

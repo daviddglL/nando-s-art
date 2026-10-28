@@ -1,27 +1,35 @@
 <?php
 
-namespace Tests\Feature\Auth;
+use App\Enums\Role;
+use App\Models\User;
 
-use Livewire\Volt\Volt;
-
-test('registration screen can be rendered', function () {
-    $response = $this->get('/register');
-
-    $response
+test('se muestra la pantalla de registro', function () {
+    $this->get('/register')
         ->assertOk()
-        ->assertSeeVolt('pages.auth.register');
+        ->assertSee('Registro de Usuario');
 });
 
-test('new users can register', function () {
-    $component = Volt::test('pages.auth.register')
-        ->set('name', 'Test User')
-        ->set('email', 'test@example.com')
-        ->set('password', 'password')
-        ->set('password_confirmation', 'password');
-
-    $component->call('register');
-
-    $component->assertRedirect(route('dashboard', absolute: false));
+test('un visitante se registra y queda con rol de usuario', function () {
+    $this->post('/register', [
+        'name' => 'Ana',
+        'email' => 'ana@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        // Aunque lo intente, el rol no se asigna desde el formulario
+        'role' => 'admin',
+    ])->assertRedirect('/dashboard');
 
     $this->assertAuthenticated();
+    expect(User::where('email', 'ana@example.com')->first()->role)->toBe(Role::User);
+});
+
+test('el registro exige confirmar la contraseña', function () {
+    $this->post('/register', [
+        'name' => 'Ana',
+        'email' => 'ana@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'otra-cosa',
+    ])->assertSessionHasErrors('password');
+
+    $this->assertGuest();
 });

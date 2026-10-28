@@ -1,28 +1,17 @@
 @extends('layouts.app')
+@use('App\Enums\Style')
 @section('content')
 <main id="galeria-main" class="flex flex-col items-center min-h-screen bg-gray-100 transition-colors duration-500">
     <h2 class="text-3xl font-bold text-gray-800 pt-12 mb-4">Muestras</h2>
 
     <!-- Estilos -->
-    @php
-        $colores = [
-            'acuarela' => 'bg-blue-100 text-blue-900 hover:bg-blue-200',
-            'rotulador' => 'bg-yellow-100 text-yellow-900 hover:bg-yellow-200',
-            'oleo' => 'bg-pink-100 text-pink-900 hover:bg-pink-200',
-            'sketch' => 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-            'papel' => 'bg-green-100 text-green-900 hover:bg-green-200',
-            'lienzo' => 'bg-purple-100 text-purple-900 hover:bg-purple-200',
-        ];
-    @endphp
-
     <div class="flex space-x-2 mb-4">
-        @foreach(['acuarela', 'rotulador', 'oleo', 'sketch', 'papel', 'lienzo'] as $style)
-            <button 
-                class="px-4 py-2 font-semibold rounded filtro-estilo bg-gray-200 text-gray-800"
-                data-style="{{ $style }}"
-                data-color="{{ $colores[$style] }}"
+        @foreach(Style::cases() as $style)
+            <button
+                class="px-4 py-2 font-semibold rounded-sm filtro-estilo bg-gray-200 text-gray-800"
+                data-style="{{ $style->value }}"
             >
-                {{ ucfirst($style) }}
+                {{ $style->label() }}
             </button>
         @endforeach
     </div>
@@ -35,33 +24,22 @@
         </div>
 
         <!-- Flechas -->
-        <button id="prev" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow p-2 rounded-full hover:bg-gray-100">
+        <button id="prev" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow-sm p-2 rounded-full hover:bg-gray-100">
             ◀
         </button>
-        <button id="next" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow p-2 rounded-full hover:bg-gray-100">
+        <button id="next" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow-sm p-2 rounded-full hover:bg-gray-100">
             ▶
         </button>
     </div>
 
-    @if(Auth::check() && Auth::user()->role === 'admin')
+    @if(Auth::user()?->isAdmin())
         <a href="{{ route('products.create') }}"
-           class="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+           class="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-sm">
            Añadir Nueva Obra
         </a>
     @endif
 </main>
-<footer class="w-full  bg-gradient-to-r from-blue-200 via-purple-100 to-pink-200 py-6 shadow-inner">
-    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between px-6">
-        <div class="text-gray-700 text-center md:text-left mb-2 md:mb-0">
-            © {{ date('Y') }} Nando's Art. Todos los derechos reservados.
-        </div>
-        <div class="flex space-x-4 justify-center">
-            <a href="https://www.instagram.com/nandomtgalters/" target="_blank" class="text-gray-600 hover:text-pink-500 transition-colors">
-                <svg class="w-6 h-6 inline" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm6 1.25a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
-            </a>
-        </div>
-    </div>
-</footer>
+<x-footer />
 @endsection
 
 @section('scripts')
@@ -73,25 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnPrev = document.getElementById("prev");
     const main = document.getElementById("galeria-main");
 
-    // Relación estilo -> clase de fondo Tailwind
-    const fondos = {
-        acuarela: "bg-blue-100",
-        rotulador: "bg-yellow-100",
-        oleo: "bg-pink-100",
-        sketch: "bg-gray-100",
-        papel: "bg-green-100",
-        lienzo: "bg-purple-100"
-    };
-
-    // Relación estilo -> clases de botón
-    const coloresBtn = {
-        acuarela: "bg-blue-100 text-blue-900 hover:bg-blue-200",
-        rotulador: "bg-yellow-100 text-yellow-900 hover:bg-yellow-200",
-        oleo: "bg-pink-100 text-pink-900 hover:bg-pink-200",
-        sketch: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-        papel: "bg-green-100 text-green-900 hover:bg-green-200",
-        lienzo: "bg-purple-100 text-purple-900 hover:bg-purple-200"
-    };
+    // Colores de cada estilo: salen del enum App\Enums\Style
+    const fondos = @json(collect(Style::cases())->mapWithKeys(fn ($s) => [$s->value => $s->background()]));
+    const coloresBtn = @json(collect(Style::cases())->mapWithKeys(fn ($s) => [$s->value => $s->buttonClasses()]));
 
     let productos = [];
     let currentIndex = 0;
@@ -102,12 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function seleccionarBoton(estilo) {
         botones.forEach(boton => {
-            // Quita el color a todos
-            boton.className = "px-4 py-2 font-semibold rounded filtro-estilo bg-gray-200 text-gray-800";
-            // Si es el seleccionado, ponle su color pastel
-            if (boton.dataset.style === estilo) {
-                boton.className += " " + coloresBtn[estilo];
-            }
+            // El seleccionado lleva su color pastel; el resto, gris
+            const color = boton.dataset.style === estilo ? coloresBtn[estilo] : "bg-gray-200 text-gray-800";
+            boton.className = "px-4 py-2 font-semibold rounded-sm filtro-estilo " + color;
+            boton.setAttribute("aria-pressed", boton.dataset.style === estilo);
         });
     }
 
@@ -138,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
         img.src = `/storage/obras/${encodeURIComponent(producto.imagen)}`;
         img.alt = producto.name;
         img.loading = "lazy";
-        img.className = "w-full h-48 object-cover rounded mb-2";
+        img.className = "w-full h-48 object-cover rounded-sm mb-2";
         return img;
     };
 
@@ -155,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Espaciador izquierdo
         const spacerLeft = document.createElement("div");
-        spacerLeft.className = "flex-shrink-0";
+        spacerLeft.className = "shrink-0";
         spacerLeft.style.width = `${cardWidth}px`;
         contenedor.appendChild(spacerLeft);
 
@@ -178,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const card = document.createElement("div");
-            card.className = `min-w-[400px] max-w-[400px] h-[520px] bg-white p-6 rounded-2xl border border-gray-300 flex-shrink-0 flex flex-col justify-between mx-2 transition-all duration-500 ease-in-out ${extraClasses}`;
+            card.className = `min-w-[400px] max-w-[400px] h-[520px] bg-white p-6 rounded-2xl border border-gray-300 shrink-0 flex flex-col justify-between mx-2 transition-all duration-500 ease-in-out ${extraClasses}`;
             // Se construye con textContent para que el texto de las obras nunca se interprete como HTML
             card.append(
                 crearElemento("h3", "text-xl font-bold text-gray-800 mb-2", producto.name),
@@ -192,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Espaciador derecho
         const spacerRight = document.createElement("div");
-        spacerRight.className = "flex-shrink-0";
+        spacerRight.className = "shrink-0";
         spacerRight.style.width = `${cardWidth}px`;
         contenedor.appendChild(spacerRight);
 
@@ -216,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Carga inicial
-    cargarEstilo("acuarela");
+    cargarEstilo(@json(Style::Acuarela->value));
 
     botones.forEach(boton => {
         boton.addEventListener("click", () => {

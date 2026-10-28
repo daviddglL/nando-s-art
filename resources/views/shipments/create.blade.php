@@ -1,14 +1,16 @@
 @extends('layouts.app')
+@use('App\Enums\Category')
+@use('App\Enums\Style')
 
 @section('content')
-<div class="max-w-2xl mx-auto bg-white p-8 rounded shadow mt-10">
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-sm shadow-sm mt-10">
     <h2 class="text-2xl font-bold text-center mb-6">Solicitar Presupuesto</h2>
 
     <form action="{{ route('shipments.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
         @if ($errors->any())
-            <div class="bg-red-100 text-red-700 p-3 rounded">
+            <div class="bg-red-100 text-red-700 p-3 rounded-sm">
                 <ul class="list-disc list-inside">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -35,24 +37,19 @@
 
         <div>
             <label class="block text-gray-700 font-semibold mb-1">Estilo</label>
-            <select name="style" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="acuarela">Acuarela</option>
-                <option value="rotulador">Rotulador</option>
-                <option value="oleo">Óleo</option>
-                <option value="sketch">Sketch</option>
-                <option value="papel">Papel</option>
-                <option value="lienzo">Lienzo</option>
+            <select name="style" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+                @foreach (Style::cases() as $style)
+                    <option value="{{ $style->value }}" @selected(old('style') === $style->value)>{{ $style->label() }}</option>
+                @endforeach
             </select>
         </div>
 
         <div>
             <label class="block text-gray-700 font-semibold mb-1">Categoría</label>
-            <select name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="retrato">Retrato</option>
-                <option value="paisaje">Paisaje</option>
-                <option value="abstracto">Abstracto</option>
-                <option value="urbano">Urbano</option>
-                <option value="otro">Otro</option>
+            <select name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+                @foreach (Category::cases() as $category)
+                    <option value="{{ $category->value }}" @selected(old('category') === $category->value)>{{ $category->label() }}</option>
+                @endforeach
             </select>
         </div>
 

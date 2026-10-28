@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ShipmentStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +20,7 @@ return new class extends Migration
             $table->string('style');
             $table->string('category');
             $table->string('imagen')->nullable();
-            $table->enum('status', ['pending', 'reviewed', 'completed'])->default('pending');
+            $table->enum('status', ShipmentStatus::values())->default(ShipmentStatus::Pending->value);
 
             $table->timestamps();
             $table->softDeletes();

@@ -2,7 +2,7 @@
 
 Fecha del análisis: 28/10/2026. Rama analizada: `master` (último commit `ec3c06f`).
 
-La sección 11 registra la evolución del proyecto respecto a este análisis.
+La sección 11 registra la evolución del proyecto respecto a este análisis (última revisión: 3, cierre de la fase 2).
 
 Este documento recoge qué conviene **arreglar**, **actualizar**, **mejorar** y qué **funcionalidades faltan**. Está ordenado por prioridad dentro de cada sección. Las referencias a ficheros usan la forma `ruta:línea`.
 
@@ -350,3 +350,42 @@ La fase 1 está cerrada. El siguiente bloque es la **fase 2 (limpieza)**:
 5. Actualizar dependencias y pasar Pint.
 
 Después vendrán la fase 3 (MVI y CI) y la fase 4 (funcionalidades), sin cambios desde la revisión 1.
+
+### Revisión 3 (28/10/2026), fase 2: limpieza
+
+**Resumen:** la fase 2 está **terminada**. La web tiene ahora un solo sistema de login, un solo CSS (Tailwind 4 compilado con Vite), sin Bootstrap, Sass, Livewire ni el CDN, y las listas de estilos, categorías, estados y roles salen de enums. Para el visitante se ve igual; por dentro hay 58 ficheros menos (66 borrados y 8 nuevos).
+
+| Punto de la fase 2 | Estado | Cómo se resolvió |
+|---|---|---|
+| Un solo sistema de login | ✅ | Se queda `laravel/ui`, que es el que usaba la web (`Auth::routes()`). Se quitan Breeze, Volt y Livewire con sus componentes, vistas y `routes/auth.php`. El perfil (`/profile`) se rehízo con `ProfileController` y Blade: cambiar datos, cambiar contraseña y borrar la cuenta. Hay enlace "Mi perfil" en el menú. |
+| Los 10 tests heredados de Breeze/Volt | ✅ | Reescritos contra las rutas reales: login, registro, recuperar y confirmar contraseña, y perfil. Se borra el de verificación de email (esa función no está activada). |
+| Tailwind 4 con Vite; fuera CDN, Bootstrap y Sass | ✅ | El layout carga `@vite`. Se borran `tailwind.config.js`, `postcss.config.js`, `resources/sass`, `bootstrap.js` y axios. Las clases de Tailwind 3 se renombraron a sus equivalentes de la 4 (`shadow`, `rounded`, `flex-shrink-0`, `bg-gradient-to-*`…). El login y las pantallas de contraseña, que eran HTML suelto o Bootstrap, ahora usan el layout con Tailwind. |
+| Borrar Kernel y providers muertos | ✅ | Fuera `app/Http/kernel.php`, los middlewares que solo usaba él, y `Auth`, `Event`, `Route`, `Middleware` y `Volt` ServiceProvider. El alias `admin` se registra en `bootstrap/app.php`. |
+| Enums | ✅ | `App\Enums\Style`, `Category`, `ShipmentStatus` y `Role`, con etiqueta en español y colores. Los usan migraciones, validación, seeders, modelos y vistas (botones de la galería, selects de los formularios, tabla del admin y dashboard). `User::isAdmin()` sustituye a los `role === 'admin'` repartidos por el código. |
+| Actualizar dependencias | ✅ | Laravel 12.3 → 12.70, Pest 3.8, Vite 6 → 7, laravel-vite-plugin 2, Tailwind 3 → 4. Fuera `doctrine/dbal`. `composer audit` y `npm audit`: 0 avisos. |
+| Pint | ✅ | Pasado a todo el proyecto. |
+
+**Hallazgo importante:** `config/app.php` tenía su propia lista de `providers` que seguía registrando `RouteServiceProvider`, así que las rutas web y API se cargaban **dos veces**. Se ha quitado esa lista; ahora solo vale `bootstrap/providers.php`.
+
+**Extras de limpieza:**
+- Footer en un componente `<x-footer>` (estaba copiado en la landing y la galería), con `rel="noopener noreferrer"` en el enlace de Instagram.
+- `frase.js` pasa a `resources/js` y se compila con Vite. El proxy de la frase ya no da error 500 si el servicio externo responde con error.
+- La galería marca bien el estilo seleccionado (antes el gris tapaba el color) y usa `aria-pressed`.
+- Textos de la interfaz en español: "Ver Shipments" pasa a "Presupuestos recibidos", y los estados se muestran como "Pendiente", "Revisado" y "Completado". La tabla del admin muestra también el cliente y el estado.
+- Tras iniciar sesión se va a `/dashboard`; se borra `/home`, que era una plantilla vacía.
+- Borradas vistas sin uso (`welcome`, `home`, `muestras`, `create` de raíz), `resources/js/galeria.js`, los comentarios con rutas locales de Windows, los workflows heredados de Laravel, `CHANGELOG.md` y `.styleci.yml`.
+- `composer.json` con el nombre del proyecto; `.env.example` con `APP_NAME="Nando's Art"` y `APP_LOCALE=es`. Los tests usan SQLite en memoria.
+- README con los pasos de instalación.
+
+**Tests:** 59 en verde y ninguno fallando (antes 39 en verde y 10 rotos). 9 nuevos en `tests/Feature/Fase2LimpiezaTest.php`, más los de login y perfil reescritos.
+
+**Importante para producción:** como el CSS ya no viene del CDN, el despliegue tiene que ejecutar `npm ci && npm run build`. Si no, las páginas fallan al no encontrar `public/build/manifest.json`. Los presupuestos antiguos con estilos que no existen (los del seeder anterior, como "realismo") se siguen mostrando tal cual.
+
+#### Qué falta ahora
+
+Las fases 1 y 2 están cerradas. Lo siguiente es la **fase 3 (MVI y tests)**:
+1. Sacar el `<script>` de la galería a módulos MVI (`intents`, `reducer`, `view`…) cargados con Vite, con tests en Vitest.
+2. Backend: FormRequests, Actions, API Resources y Policies para `Product` y `Shipment`.
+3. CI que compile los assets y pase `pint --test`, `composer audit` y Larastan.
+
+Quedan de la limpieza, para cuando se toque esa parte: renombrar `Shipment` a `QuoteRequest`/`Encargo` en el código y traducir los mensajes de validación (`laravel-lang`). La fase 4 (funcionalidades) sigue igual que en la revisión 1.
