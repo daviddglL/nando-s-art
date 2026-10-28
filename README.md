@@ -2,11 +2,11 @@
 
 Galería de arte de Fernando Delgado: muestra las obras por estilo y permite a los clientes pedir presupuestos.
 
-Hecha con Laravel 12, Tailwind CSS 4 y Vite. El login es el de `laravel/ui` (rutas de `Auth::routes()`).
+Hecha con Laravel 13, Tailwind CSS 4 y Vite. El login es el de `laravel/ui` (rutas de `Auth::routes()`).
 
 ## Instalación
 
-Requisitos: PHP 8.2+ con la extensión GD (con soporte WebP, para las miniaturas), Composer, Node 20+ y MySQL (o SQLite para pruebas).
+Requisitos: PHP 8.4.1+ con la extensión GD (con soporte WebP, para las miniaturas), Composer, Node 22.12+ y MySQL (o SQLite para pruebas).
 
 ```bash
 composer install
