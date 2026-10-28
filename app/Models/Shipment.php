@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\Category;
+use App\Enums\ShipmentStatus;
+use App\Enums\Style;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,7 +20,13 @@ class Shipment extends Model
         'style',
         'category',
         'imagen',
-        'status'
+        'status',
+    ];
+
+    // style y category no se convierten a enum: son columnas string y puede haber
+    // presupuestos antiguos con valores que ya no existen. Se leen con styleEnum()/categoryEnum().
+    protected $casts = [
+        'status' => ShipmentStatus::class,
     ];
 
     public function user()
@@ -25,8 +34,13 @@ class Shipment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function product()
+    public function styleEnum(): ?Style
     {
-        return $this->belongsTo(Product::class);
+        return Style::tryFrom((string) $this->style);
+    }
+
+    public function categoryEnum(): ?Category
+    {
+        return Category::tryFrom((string) $this->category);
     }
 }

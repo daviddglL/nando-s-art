@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Enums\Role;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB as DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
@@ -20,7 +19,7 @@ class UserSeeder extends Seeder
         // Sin ADMIN_PASSWORD en .env se genera una aleatoria y se muestra una sola vez
         if (empty($password)) {
             $password = Str::password(16);
-            $this->command?->warn('ADMIN_PASSWORD no está definida. Contraseña generada para ' . config('admin.email') . ': ' . $password);
+            $this->command?->warn('ADMIN_PASSWORD no está definida. Contraseña generada para '.config('admin.email').': '.$password);
         }
 
         $users = [
@@ -28,7 +27,7 @@ class UserSeeder extends Seeder
                 'name' => config('admin.name'),
                 'email' => config('admin.email'),
                 'password' => bcrypt($password),
-                'role' => 'admin',
+                'role' => Role::Admin->value,
                 'remember_token' => Str::random(10),
             ],
         ];
@@ -39,7 +38,7 @@ class UserSeeder extends Seeder
                 'name' => 'admin',
                 'email' => 'admin@example.com',
                 'password' => bcrypt('admin'),
-                'role' => 'admin',
+                'role' => Role::Admin->value,
                 'remember_token' => Str::random(10),
             ];
         }

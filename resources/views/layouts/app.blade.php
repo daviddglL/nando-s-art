@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', "Nando's Art")</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body id="body-app" class="bg-gray-100 min-h-screen">
 
     <!-- NAVBAR -->
-
-
-    {{-- Puedes poner esto en layouts.app o al inicio de tu vista index.blade.php --}}
-    <nav class="bg-gradient-to-r from-blue-100 to-pink-100 shadow ">
+    <nav class="bg-linear-to-r from-blue-100 to-pink-100 shadow-sm ">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-4">
             <h1 class="text-2xl font-bold text-gray-700">
                 <a href="{{ url('/') }}">Nando's Art</a>
@@ -30,20 +27,23 @@
                         <a href="{{ route('login') }}" class="text-blue-500 font-semibold hover:underline">Iniciar Sesión</a>
                     </li>
                     <li>
-                        <a href="{{ route('register') }}" class="bg-pink-200 text-gray-700 px-3 py-1 rounded hover:bg-pink-300 font-medium transition">Crear cuenta</a>
+                        <a href="{{ route('register') }}" class="bg-pink-200 text-gray-700 px-3 py-1 rounded-sm hover:bg-pink-300 font-medium transition">Crear cuenta</a>
                     </li>
                 @endguest
                 @auth
                     <li>
                         <a href="{{ route('dashboard') }}" class="text-blue-500 font-semibold hover:underline">Mis presupuestos</a>
                     </li>
-                    @if(Auth::user()->role === 'admin')
+                    @if(Auth::user()->isAdmin())
                         <li>
                             <a href="{{ route('shipments.index') }}" class="text-blue-500 font-semibold hover:underline">
-                                Ver Shipments
+                                Presupuestos recibidos
                             </a>
                         </li>
                     @endif
+                    <li>
+                        <a href="{{ route('profile') }}" class="text-blue-500 font-semibold hover:underline">Mi perfil</a>
+                    </li>
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

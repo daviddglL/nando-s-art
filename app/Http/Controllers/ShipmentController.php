@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Category;
+use App\Enums\ShipmentStatus;
+use App\Enums\Style;
 use App\Models\Shipment;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ShipmentController extends Controller
 {
     public function index()
     {
-        // Puedes ajustar la consulta según permisos o filtros
-        $shipments = Shipment::all();
-        $users = \App\Models\User::all();
+        $shipments = Shipment::with('user')->latest()->get();
+        $users = User::all();
+
         return view('shipments.index', compact('shipments', 'users'));
     }
 
@@ -26,8 +31,8 @@ class ShipmentController extends Controller
             'description' => 'required|string',
             'height' => 'required|numeric',
             'width' => 'required|numeric',
-            'style' => 'required|string',
-            'category' => 'required|string',
+            'style' => ['required', Rule::enum(Style::class)],
+            'category' => ['required', Rule::enum(Category::class)],
             'imagen' => 'nullable|image|max:2048',
         ]);
 
@@ -36,9 +41,9 @@ class ShipmentController extends Controller
         }
 
         // El presupuesto siempre pertenece al usuario autenticado
-        $request->user()->shipments()->create($validated + ['status' => 'pending']);
+        $request->user()->shipments()->create($validated + ['status' => ShipmentStatus::Pending]);
 
-        $ruta = $request->user()->role === 'admin' ? 'shipments.index' : 'dashboard';
+        $ruta = $request->user()->isAdmin() ? 'shipments.index' : 'dashboard';
 
         return redirect()->route($ruta)->with('success', 'Presupuesto enviado correctamente');
     }
@@ -47,6 +52,6 @@ class ShipmentController extends Controller
     {
         $shipment->delete();
 
-        return redirect()->route('shipments.index')->with('success', 'Shipment eliminado correctamente');
+        return redirect()->route('shipments.index')->with('success', 'Presupuesto eliminado correctamente');
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,11 +18,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin', 'user'])->default('user');            
+            $table->enum('role', Role::values())->default('user');
 
             $table->rememberToken();
             $table->timestamps();
-            //add deleted_at column
+            // add deleted_at column
             $table->softDeletes();
         });
 

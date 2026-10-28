@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -24,7 +26,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => ['sometimes', Rule::in(['admin', 'user'])],
+            'role' => ['sometimes', Rule::enum(Role::class)],
         ]);
 
         $user = new User([
@@ -32,7 +34,7 @@ class UserController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
-        $user->role = $data['role'] ?? 'user';
+        $user->role = $data['role'] ?? Role::User;
         $user->save();
 
         return response()->json($user, 201);
@@ -54,7 +56,7 @@ class UserController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'email' => ['sometimes', 'required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => 'sometimes|required|string|min:8',
-            'role' => ['sometimes', Rule::in(['admin', 'user'])],
+            'role' => ['sometimes', Rule::enum(Role::class)],
         ]);
 
         if (array_key_exists('role', $data)) {
@@ -77,6 +79,7 @@ class UserController extends Controller
         Gate::authorize('delete', $user);
 
         $user->delete();
+
         return response()->json(['message' => 'User deleted']);
     }
 }

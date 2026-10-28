@@ -1,4 +1,6 @@
 @extends('layouts.app')
+@use('App\Enums\Category')
+@use('App\Enums\Style')
 
 @section('content')
     <div class="max-w-2xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
@@ -9,45 +11,40 @@
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-1">Nombre de la obra</label>
-                <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-1">Descripción</label>
-                <textarea name="description" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                <textarea name="description" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500"></textarea>
             </div>
 
             <div class="flex space-x-4">
                 <div class="w-1/2">
                     <label class="block text-gray-700 font-semibold mb-1">Altura (cm)</label>
-                    <input type="number" step="0.01" name="height" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="number" step="0.01" name="height" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div class="w-1/2">
                     <label class="block text-gray-700 font-semibold mb-1">Ancho (cm)</label>
-                    <input type="number" step="0.01" name="width" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="number" step="0.01" name="width" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-1">Estilo</label>
-                <select name="style" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="acuarela">Acuarela</option>
-                    <option value="rotulador">Rotulador</option>
-                    <option value="oleo">Óleo</option>
-                    <option value="sketch">Sketch</option>
-                    <option value="papel">Papel</option>
-                    <option value="lienzo">Lienzo</option>
+                <select name="style" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+                    @foreach (Style::cases() as $style)
+                        <option value="{{ $style->value }}" @selected(old('style') === $style->value)>{{ $style->label() }}</option>
+                    @endforeach
                 </select>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold mb-1">Categoría</label>
-                <select name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="retrato">Retrato</option>
-                    <option value="paisaje">Paisaje</option>
-                    <option value="abstracto">Abstracto</option>
-                    <option value="urbano">Urbano</option>
-                    <option value="otro">Otro</option>
+                <select name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+                    @foreach (Category::cases() as $category)
+                        <option value="{{ $category->value }}" @selected(old('category') === $category->value)>{{ $category->label() }}</option>
+                    @endforeach
                 </select>
             </div>
 
@@ -57,7 +54,7 @@
             </div>
 
             <div class="text-center">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-sm">
                     Guardar
                 </button>
             </div>

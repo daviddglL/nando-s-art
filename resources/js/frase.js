@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const fraseContainer = document.getElementById('frase-del-dia');
+    // Solo la landing tiene el hueco para la frase
+    if (!fraseContainer) return;
 
     fetch('/frase-proxy')
         .then(response => {
@@ -20,6 +22,9 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => {
             console.error('Error al obtener la frase:', error);
-            fraseContainer.innerHTML = '<p class="text-red-500">No se pudo cargar la frase del día.</p>';
+            const aviso = document.createElement('p');
+            aviso.className = 'text-red-500';
+            aviso.textContent = 'No se pudo cargar la frase del día.';
+            fraseContainer.replaceChildren(aviso);
         });
 });

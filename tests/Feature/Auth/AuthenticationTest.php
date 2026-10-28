@@ -1,72 +1,59 @@
 <?php
 
 use App\Models\User;
-use Livewire\Volt\Volt;
 
-test('login screen can be rendered', function () {
-    $response = $this->get('/login');
-
-    $response
+test('se muestra la pantalla de login', function () {
+    $this->get('/login')
         ->assertOk()
-        ->assertSeeVolt('pages.auth.login');
+        ->assertSee('Iniciar Sesión');
 });
 
-test('users can authenticate using the login screen', function () {
+test('un usuario inicia sesión y va a su dashboard', function () {
     $user = User::factory()->create();
 
-    $component = Volt::test('pages.auth.login')
-        ->set('form.email', $user->email)
-        ->set('form.password', 'password');
+    $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ])->assertRedirect('/dashboard');
 
-    $component->call('login');
-
-    $component
-        ->assertHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
-
-    $this->assertAuthenticated();
+    $this->assertAuthenticatedAs($user);
 });
 
-test('users can not authenticate with invalid password', function () {
+test('con una contraseña incorrecta no se inicia sesión', function () {
     $user = User::factory()->create();
 
-    $component = Volt::test('pages.auth.login')
-        ->set('form.email', $user->email)
-        ->set('form.password', 'wrong-password');
-
-    $component->call('login');
-
-    $component
-        ->assertHasErrors()
-        ->assertNoRedirect();
+    $this->from('/login')->post('/login', [
+        'email' => $user->email,
+        'password' => 'contraseña-incorrecta',
+    ])->assertRedirect('/login')->assertSessionHasErrors('email');
 
     $this->assertGuest();
 });
 
-test('navigation menu can be rendered', function () {
-    $user = User::factory()->create();
-
-    $this->actingAs($user);
-
-    $response = $this->get('/dashboard');
-
-    $response
+test('el menú muestra las opciones del usuario con sesión iniciada', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/dashboard')
         ->assertOk()
-        ->assertSeeVolt('layout.navigation');
+        ->assertSee('Mis presupuestos')
+        ->assertSee('Mi perfil')
+        ->assertSee('Cerrar sesión')
+        ->assertDontSee('Presupuestos recibidos');
 });
 
-test('users can logout', function () {
-    $user = User::factory()->create();
-
-    $this->actingAs($user);
-
-    $component = Volt::test('layout.navigation');
-
-    $component->call('logout');
-
-    $component
-        ->assertHasNoErrors()
+test('un usuario cierra sesión', function () {
+    $this->actingAs(User::factory()->create())
+        ->post('/logout')
         ->assertRedirect('/');
 
     $this->assertGuest();
+});
+
+test('un invitado que entra al dashboard va al login', function () {
+    $this->get('/dashboard')->assertRedirect('/login');
+});
+
+test('un usuario con sesión iniciada no vuelve a ver el login', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/login')
+        ->assertRedirect('/dashboard');
 });

@@ -1,20 +1,12 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-
-function adminFase1(): User
-{
-    $user = User::factory()->create();
-    $user->role = 'admin';
-    $user->save();
-
-    return $user;
-}
 
 test('un invitado o un usuario normal no pueden subir imágenes sueltas', function () {
     Storage::fake('public');
@@ -30,7 +22,7 @@ test('un invitado o un usuario normal no pueden subir imágenes sueltas', functi
 
 test('el admin sube imágenes con nombre aleatorio y no se aceptan SVG', function () {
     Storage::fake('public');
-    $admin = adminFase1();
+    $admin = admin();
 
     $this->actingAs($admin)
         ->postJson('/api/upload-image', ['image' => UploadedFile::fake()->image('mi foto.jpg')])
@@ -52,7 +44,7 @@ test('la ruta /api/test ya no existe', function () {
 
 test('dos obras con el mismo nombre de archivo no comparten imagen', function () {
     Storage::fake('public');
-    $admin = adminFase1();
+    $admin = admin();
 
     $datos = fn () => [
         'name' => 'Obra', 'description' => 'd', 'height' => 30, 'width' => 40,
@@ -74,7 +66,7 @@ test('dos obras con el mismo nombre de archivo no comparten imagen', function ()
 test('una obra con un estilo que no existe se rechaza', function () {
     Storage::fake('public');
 
-    $this->actingAs(adminFase1())->post('/galeria', [
+    $this->actingAs(admin())->post('/galeria', [
         'name' => 'Obra', 'description' => 'd', 'height' => 30, 'width' => 40,
         'style' => 'cubismo', 'category' => 'paisaje',
         'imagen' => UploadedFile::fake()->image('cuadro.jpg'),
@@ -88,7 +80,7 @@ test('el rol no se puede asignar en masa', function () {
         'name' => 'x', 'email' => 'x@example.com', 'password' => 'secreto123', 'role' => 'admin',
     ]);
 
-    expect($user->fresh()->role)->toBe('user');
+    expect($user->fresh()->role)->toBe(Role::User);
 });
 
 test('la frase del día se cachea hasta el día siguiente', function () {
