@@ -16,6 +16,7 @@ class Shipment extends Model
         'width',
         'style',
         'category',
+        'imagen',
         'status'
     ];
 

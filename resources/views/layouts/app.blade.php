@@ -30,6 +30,9 @@
                     </li>
                 @endguest
                 @auth
+                    <li>
+                        <a href="{{ route('dashboard') }}" class="text-blue-500 font-semibold hover:underline">Mis presupuestos</a>
+                    </li>
                     @if(Auth::user()->role === 'admin')
                         <li>
                             <a href="{{ route('shipments.index') }}" class="text-blue-500 font-semibold hover:underline">
