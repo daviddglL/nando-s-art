@@ -11,11 +11,8 @@ Route::middleware(['web', 'auth'])->group(function () {
 // Solo lectura: la creación de obras va por la ruta web protegida con 'admin'
 Route::apiResource('products', ProductController::class)->only(['index', 'show']);
 
-
-Route::get('/test', function () {
-    return response()->json(['message' => 'API funcionando']);
+// Subida suelta de imágenes: solo el admin
+Route::middleware(['web', 'auth', 'admin'])->group(function () {
+    Route::post('/upload-image', [ImageUploadController::class, 'upload']);
 });
 
-
-
-Route::post('/upload-image', [ImageUploadController::class, 'upload']);

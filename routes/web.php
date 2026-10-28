@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
@@ -37,11 +38,27 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/shipments/{shipment}', [ShipmentController::class, 'destroy'])->name('shipments.destroy');
 });
 
-// Ruta para obtener frase del día (proxy para evitar CORS)
+// Ruta para obtener frase del día (proxy para evitar CORS).
+// Se cachea hasta medianoche y no deja la página colgada si el servicio externo falla.
 Route::get('/frase-proxy', function () {
-    $response = Http::get('https://frasedeldia.azurewebsites.net/api/phrase');
-    return response()->json($response->json());
-});
+    $frase = Cache::get('frase-del-dia');
+
+    if (! $frase) {
+        try {
+            $response = Http::timeout(3)->get('https://frasedeldia.azurewebsites.net/api/phrase');
+            if ($response->successful() && $response->json('phrase')) {
+                $frase = $response->json();
+                Cache::put('frase-del-dia', $frase, now()->endOfDay());
+            }
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            report($e);
+        }
+    }
+
+    return $frase
+        ? response()->json($frase)
+        : response()->json(['message' => 'No se pudo cargar la frase del día'], 503);
+})->middleware('throttle:60,1');
 
 // Autenticación
 
@@ -54,7 +71,9 @@ Route::get('/admin', [AdminController::class, 'index'])->middleware(['auth', 'ad
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/presupuesto', [ShipmentController::class, 'create'])->name('shipments.create');
-    Route::post('/presupuesto', [ShipmentController::class, 'store'])->name('shipments.store');
+    Route::post('/presupuesto', [ShipmentController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('shipments.store');
 
 });
 

@@ -313,4 +313,40 @@ Leyenda: ✅ hecho · 🟡 a medias · ❌ pendiente.
 - Funcionalidades nuevas: CRUD completo de obras, detalle de obra, cambio de estado de presupuestos, emails… (punto 8).
 - README (punto 9).
 
-**Siguiente paso recomendado:** cerrar los puntos 1 y 2 de la lista anterior (seguridad), y después empezar la fase 2 (limpieza de dependencias y CSS), que es la base para hacer el MVI.
+**Siguiente paso recomendado (en su momento):** cerrar los puntos 1 y 2 de la lista anterior (seguridad), y después empezar la fase 2 (limpieza de dependencias y CSS), que es la base para hacer el MVI.
+
+### Revisión 2 (28/10/2026), cierre de la fase 1
+
+**Resumen:** la fase 1 está **terminada**. David ha cambiado la contraseña antigua y se han cerrado los puntos de seguridad que quedaban. La web se comporta igual para el visitante, pero ya no se puede subir nada sin ser admin ni inyectar HTML en la galería.
+
+| Pendiente de la revisión 1 | Estado | Cómo se resolvió |
+|---|---|---|
+| Cambiar la contraseña antigua del admin | ✅ | La ha cambiado David. |
+| `POST /api/upload-image` sin login y con SVG | ✅ | Ahora exige sesión y rol admin (`web` + `auth` + `admin`). Se quita `svg`, se permite `webp` y el nombre del fichero es aleatorio. |
+| `/api/test` expuesta | ✅ | Eliminada. |
+| Imagen de obra con el nombre original | ✅ | `ProductController::store` usa `store('obras', 'public')` con un nombre aleatorio. Dos obras con el mismo nombre de archivo ya no se pisan. Además, el estilo y la categoría se validan contra los valores de la base de datos. |
+| XSS por `innerHTML` | ✅ | Las tarjetas de la galería y la frase del día se construyen con `textContent`. |
+| `role` en `$fillable` | ✅ | Eliminado; el rol solo se asigna a mano donde `UserPolicy` lo permite. |
+| `/frase-proxy` sin caché ni timeout | ✅ | Timeout de 3 s, caché hasta medianoche, respuesta 503 si el servicio cae y `throttle:60,1`. |
+| `POST /presupuesto` sin límite | ✅ | `throttle:5,1` (5 envíos por minuto). |
+| Comentario obsoleto en `UserApiTest` | ✅ | Eliminado junto con el código que cargaba `api.php` a mano. |
+
+**Extras arreglados de paso:**
+- `galeria.blade.php` ya no repite `<html>`/`<body>`: el script va en `@section('scripts')` dentro del layout (punto 1.5).
+- El layout tiene `charset`, `viewport`, `csrf-token` y `<title>` (punto 1.6).
+- La galería muestra "Todavía no hay obras de este estilo" en vez de romperse con un estilo vacío.
+
+**Tests:** 11 tests nuevos en `tests/Feature/Fase1SeguridadTest.php`. Pasan 39 tests en total. Los 10 que fallan son los heredados de Breeze/Volt (`tests/Feature/Auth`, `ProfileTest`), igual que antes; se resolverán en la fase 2 al quedarse con un solo sistema de login.
+
+**Importante para producción:** las imágenes nuevas se guardan en `storage/app/public/obras`, así que el servidor necesita `php artisan storage:link` (lo mismo que ya pedían las imágenes de presupuestos).
+
+#### Qué falta ahora
+
+La fase 1 está cerrada. El siguiente bloque es la **fase 2 (limpieza)**:
+1. Quedarse con un solo sistema de login (laravel/ui o Breeze/Volt) y arreglar o borrar los 10 tests heredados.
+2. Tailwind 4 con Vite; quitar el CDN, Bootstrap y Sass.
+3. Borrar `kernel.php` y los providers muertos.
+4. Enums para estilo, categoría, estado y rol, y unificar los datos de seeders y vistas.
+5. Actualizar dependencias y pasar Pint.
+
+Después vendrán la fase 3 (MVI y CI) y la fase 4 (funcionalidades), sin cambios desde la revisión 1.
