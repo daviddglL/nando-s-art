@@ -10,7 +10,7 @@
         </a>
     </div>
 
-    <p class="text-gray-600 mb-4">Este es el orden en que salen en la galería. Usa las flechas para cambiarlo.</p>
+    <p class="text-gray-600 mb-4">Este es el orden en que salen en la galería. Usa las flechas para cambiarlo. Las obras con ★ salen en la portada (las {{ \App\Models\Product::MAX_DESTACADAS }} primeras).</p>
 
     <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
         <table class="min-w-full text-left">
@@ -49,9 +49,15 @@
                             <span @class(['text-green-700' => $obra->available, 'text-gray-500' => ! $obra->available])>
                                 {{ $obra->available ? 'Disponible' : 'Vendida' }}
                             </span>
-                            @if ($obra->featured)
-                                <span class="ml-1 text-yellow-700">★ Destacada</span>
-                            @endif
+                            <form method="POST" action="{{ route('admin.obras.destacar', $obra) }}" class="inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" aria-pressed="{{ $obra->featured ? 'true' : 'false' }}"
+                                        title="{{ $obra->featured ? 'Quitar de la portada' : 'Mostrar en la portada' }}"
+                                        @class(['ml-1 px-2 py-0.5 rounded-sm hover:bg-yellow-50', 'text-yellow-700' => $obra->featured, 'text-gray-400' => ! $obra->featured])>
+                                    {{ $obra->featured ? '★ Destacada' : '☆ Destacar' }}
+                                </button>
+                            </form>
                         </td>
                         <td class="py-2 px-3 text-right whitespace-nowrap">
                             <a href="{{ route('admin.obras.edit', $obra) }}" class="inline-block bg-blue-100 text-gray-700 px-3 py-1 rounded-sm hover:bg-blue-200">Editar</a>
