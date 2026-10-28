@@ -35,10 +35,10 @@
                 </div>
             </div>
         </div>
-        <!-- Columna derecha: Shipments -->
+        <!-- Columna derecha: encargos -->
         <div class="w-full md:w-2/3">
             <div class="flex justify-end mb-4">
-                <a href="{{ route('shipments.create') }}"
+                <a href="{{ route('encargos.create') }}"
                    class="bg-linear-to-r from-blue-200 to-pink-200 text-gray-700 px-5 py-2 rounded-lg shadow-sm font-semibold hover:scale-105 transition border border-blue-100">
                     + Nuevo presupuesto
                 </a>
@@ -61,27 +61,27 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($shipments as $shipment)
+                            @forelse($encargos as $encargo)
                                 <tr class="border-b last:border-0">
-                                    <td class="py-2 px-2">{{ $shipment->id }}</td>
-                                    <td class="py-2 px-2">{{ $shipment->description }}</td>
-                                    <td class="py-2 px-2">{{ $shipment->height }}</td>
-                                    <td class="py-2 px-2">{{ $shipment->width }}</td>
+                                    <td class="py-2 px-2">{{ $encargo->id }}</td>
+                                    <td class="py-2 px-2">{{ $encargo->description }}</td>
+                                    <td class="py-2 px-2">{{ $encargo->height }}</td>
+                                    <td class="py-2 px-2">{{ $encargo->width }}</td>
                                     <td class="py-2 px-2">
-                                        <span class="{{ $shipment->styleEnum()?->textColor() ?? 'text-purple-500' }} font-semibold">
-                                            {{ $shipment->styleEnum()?->label() ?? $shipment->style }}
+                                        <span class="{{ $encargo->styleEnum()?->textColor() ?? 'text-purple-500' }} font-semibold">
+                                            {{ $encargo->styleEnum()?->label() ?? $encargo->style }}
                                         </span>
                                     </td>
                                     <td class="py-2 px-2">
-                                        <span class="{{ $shipment->categoryEnum()?->textColor() ?? 'text-gray-400' }} font-semibold">
-                                            {{ $shipment->categoryEnum()?->label() ?? $shipment->category }}
+                                        <span class="{{ $encargo->categoryEnum()?->textColor() ?? 'text-gray-400' }} font-semibold">
+                                            {{ $encargo->categoryEnum()?->label() ?? $encargo->category }}
                                         </span>
                                     </td>
-                                    <td class="py-2 px-2">{{ $shipment->user?->name }}</td>
-                                    <td class="py-2 px-2">{{ $shipment->status->label() }}</td>
-                                    <td class="py-2 px-2">{{ $shipment->created_at->format('d/m/Y') }}</td>
+                                    <td class="py-2 px-2">{{ $encargo->user?->name }}</td>
+                                    <td class="py-2 px-2">{{ $encargo->status->label() }}</td>
+                                    <td class="py-2 px-2">{{ $encargo->created_at->format('d/m/Y') }}</td>
                                     <td class="py-2 px-2">
-                                        <form action="{{ route('shipments.destroy', $shipment->id) }}" method="POST" class="inline">
+                                        <form action="{{ route('encargos.destroy', $encargo->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"

@@ -6,7 +6,7 @@
 <div class="max-w-2xl mx-auto bg-white p-8 rounded-sm shadow-sm mt-10">
     <h2 class="text-2xl font-bold text-center mb-6">Solicitar Presupuesto</h2>
 
-    <form action="{{ route('shipments.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form action="{{ route('encargos.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
         @if ($errors->any())

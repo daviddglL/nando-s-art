@@ -2,8 +2,8 @@
 
 namespace App\Enums;
 
-// Estado de un presupuesto (shipment) solicitado por un cliente
-enum ShipmentStatus: string
+// Estado de un encargo (petición de presupuesto) de un cliente
+enum EstadoEncargo: string
 {
     use HasValues;
 

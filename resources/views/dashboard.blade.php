@@ -4,7 +4,7 @@
 <div class="max-w-5xl mx-auto py-10 px-4">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-purple-800">Mis presupuestos</h1>
-        <a href="{{ route('shipments.create') }}"
+        <a href="{{ route('encargos.create') }}"
            class="bg-linear-to-r from-blue-200 to-pink-200 text-gray-700 px-5 py-2 rounded-lg shadow-sm font-semibold hover:scale-105 transition">
             + Solicitar presupuesto
         </a>
@@ -27,14 +27,14 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($shipments as $shipment)
+                @forelse ($encargos as $encargo)
                     <tr class="border-b last:border-0">
-                        <td class="py-2 px-2">{{ $shipment->description }}</td>
-                        <td class="py-2 px-2">{{ $shipment->height }} x {{ $shipment->width }}</td>
-                        <td class="py-2 px-2">{{ $shipment->styleEnum()?->label() ?? $shipment->style }}</td>
-                        <td class="py-2 px-2">{{ $shipment->categoryEnum()?->label() ?? $shipment->category }}</td>
-                        <td class="py-2 px-2">{{ $shipment->status->label() }}</td>
-                        <td class="py-2 px-2">{{ $shipment->created_at->format('d/m/Y') }}</td>
+                        <td class="py-2 px-2">{{ $encargo->description }}</td>
+                        <td class="py-2 px-2">{{ $encargo->height }} x {{ $encargo->width }}</td>
+                        <td class="py-2 px-2">{{ $encargo->styleEnum()?->label() ?? $encargo->style }}</td>
+                        <td class="py-2 px-2">{{ $encargo->categoryEnum()?->label() ?? $encargo->category }}</td>
+                        <td class="py-2 px-2">{{ $encargo->status->label() }}</td>
+                        <td class="py-2 px-2">{{ $encargo->created_at->format('d/m/Y') }}</td>
                     </tr>
                 @empty
                     <tr>

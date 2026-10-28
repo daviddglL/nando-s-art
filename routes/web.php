@@ -2,10 +2,10 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EncargoController;
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ShipmentController;
 use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -52,10 +52,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/presupuesto', [ShipmentController::class, 'create'])->name('shipments.create');
-    Route::post('/presupuesto', [ShipmentController::class, 'store'])
+    Route::get('/presupuesto', [EncargoController::class, 'create'])->name('encargos.create');
+    Route::post('/presupuesto', [EncargoController::class, 'store'])
         ->middleware('throttle:5,1')
-        ->name('shipments.store');
+        ->name('encargos.store');
 });
 
 // Rutas solo para admin
@@ -65,7 +65,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/galeria/nuevo', [ProductController::class, 'create'])->name('products.create');
     Route::post('/galeria', [ProductController::class, 'store'])->name('products.store');
 
-    // Gestión de presupuestos (shipments)
-    Route::get('/admin/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
-    Route::delete('/admin/shipments/{shipment}', [ShipmentController::class, 'destroy'])->name('shipments.destroy');
+    // Gestión de encargos (presupuestos recibidos)
+    Route::get('/admin/encargos', [EncargoController::class, 'index'])->name('encargos.index');
+    Route::delete('/admin/encargos/{encargo}', [EncargoController::class, 'destroy'])->name('encargos.destroy');
+    Route::permanentRedirect('/admin/shipments', '/admin/encargos');
 });

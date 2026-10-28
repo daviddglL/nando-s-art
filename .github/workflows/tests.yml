@@ -4,15 +4,65 @@ on:
   push:
     branches:
       - master
-      - '*.x'
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
 
 permissions:
   contents: read
 
 jobs:
+  calidad:
+    runs-on: ubuntu-latest
+    name: Pint, Larastan y auditorías
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Formato (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Análisis estático (Larastan)
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      - name: Auditoría de dependencias PHP
+        run: composer audit
+
+  js:
+    runs-on: ubuntu-latest
+    name: Vitest y build de assets
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Tests de JS (Vitest)
+        run: npm test
+
+      - name: Build de assets (Vite)
+        run: npm run build
+
+      - name: Auditoría de dependencias JS
+        run: npm audit --audit-level=high
+
   tests:
     runs-on: ubuntu-latest
 
@@ -21,7 +71,7 @@ jobs:
       matrix:
         php: [8.2, 8.3, 8.4]
 
-    name: PHP ${{ matrix.php }}
+    name: Pest (PHP ${{ matrix.php }})
 
     steps:
       - name: Checkout code
@@ -34,14 +84,25 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
           coverage: none
 
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-      - name: Copy environment file
-        run: cp .env.example .env
+      - name: Install dependencies
+        run: |
+          composer install --prefer-dist --no-interaction --no-progress
+          npm ci
 
-      - name: Generate app key
-        run: php artisan key:generate
+      # Las vistas usan @vite: con los assets compilados se prueba la app tal como se despliega
+      - name: Build de assets
+        run: npm run build
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
 
       - name: Execute tests
         run: php artisan test
