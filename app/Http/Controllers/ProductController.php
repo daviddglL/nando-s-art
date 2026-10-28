@@ -137,4 +137,16 @@ class ProductController extends Controller
 
         return redirect()->route('admin.obras.index');
     }
+
+    // Marca o desmarca la obra como destacada en la portada desde el listado, sin entrar a editarla
+    public function destacar(Product $obra)
+    {
+        Gate::authorize('update', $obra);
+
+        $obra->update(['featured' => ! $obra->featured]);
+
+        return redirect()->route('admin.obras.index')->with('success', $obra->featured
+            ? "«{$obra->name}» sale ahora en la portada"
+            : "«{$obra->name}» ya no sale en la portada");
+    }
 }
