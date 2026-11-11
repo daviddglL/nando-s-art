@@ -8,7 +8,7 @@ use Illuminate\Http\UploadedFile;
 
 class SubirImagenesObra
 {
-    public function __construct(private GenerarMiniaturas $miniaturas) {}
+    public function __construct(private GenerarMiniaturas $miniaturas, private GuardarImagen $guardar) {}
 
     /**
      * Añade imágenes adicionales al final de las de la obra, cada una con sus miniaturas WebP.
@@ -21,7 +21,7 @@ class SubirImagenesObra
         return array_map(function (UploadedFile $fichero) use ($obra) {
             // Nombre aleatorio, igual que la imagen principal
             $imagen = $obra->imagenes()->create([
-                'imagen' => basename((string) $fichero->store('obras', 'public')),
+                'imagen' => $this->guardar->handle($fichero, 'obras'),
             ]);
             $this->miniaturas->handle($imagen);
 

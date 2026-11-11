@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Actions\GuardarImagen;
 use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -29,7 +30,7 @@ class SubirImagenesObraRequest extends FormRequest
 
         return [
             'imagenes' => ['required', 'array', 'max:'.$quedan],
-            'imagenes.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'imagenes.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:'.GuardarImagen::MAX_KB,
         ];
     }
 

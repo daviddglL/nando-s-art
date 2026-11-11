@@ -26,29 +26,29 @@ enum Style: string
         };
     }
 
-    // Fondo pastel de la galería cuando este estilo está seleccionado
+    // Tinte del papel de la galería cuando este estilo está seleccionado
     public function background(): string
     {
         return match ($this) {
-            self::Acuarela => 'bg-blue-100',
-            self::Rotulador => 'bg-yellow-100',
-            self::Oleo => 'bg-pink-100',
-            self::Sketch => 'bg-gray-100',
-            self::Papel => 'bg-green-100',
-            self::Lienzo => 'bg-purple-100',
+            self::Acuarela => 'bg-[#e6eef1]',
+            self::Rotulador => 'bg-[#f2ecd6]',
+            self::Oleo => 'bg-[#f2e1da]',
+            self::Sketch => 'bg-[#eae8e3]',
+            self::Papel => 'bg-[#e5ece0]',
+            self::Lienzo => 'bg-[#ebe4ee]',
         };
     }
 
-    // Clases del botón de filtro cuando está activo: un tono oscuro que destaca sobre el fondo pastel del estilo
+    // Clases del botón de filtro cuando está activo: un tono oscuro del mismo color que el tinte
     public function buttonClasses(): string
     {
         return match ($this) {
-            self::Acuarela => 'bg-blue-700 text-white hover:bg-blue-800',
-            self::Rotulador => 'bg-yellow-800 text-white hover:bg-yellow-900',
-            self::Oleo => 'bg-pink-700 text-white hover:bg-pink-800',
-            self::Sketch => 'bg-gray-700 text-white hover:bg-gray-800',
-            self::Papel => 'bg-green-700 text-white hover:bg-green-800',
-            self::Lienzo => 'bg-purple-700 text-white hover:bg-purple-800',
+            self::Acuarela => 'bg-[#2c5870] text-white hover:bg-[#21465a]',
+            self::Rotulador => 'bg-[#76590f] text-white hover:bg-[#5e470b]',
+            self::Oleo => 'bg-[#8c3d1f] text-white hover:bg-[#713118]',
+            self::Sketch => 'bg-[#3a3732] text-white hover:bg-[#25231f]',
+            self::Papel => 'bg-[#44603d] text-white hover:bg-[#354c30]',
+            self::Lienzo => 'bg-[#5a3e6a] text-white hover:bg-[#473153]',
         };
     }
 

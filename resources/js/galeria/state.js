@@ -1,6 +1,6 @@
 // Estado (Model) de la galería: un único objeto que el reducer sustituye por otro nuevo.
 export const estadoInicial = Object.freeze({
-    estilo: null, // estilo seleccionado (valor de App\Enums\Style)
+    estilo: null, // estilo seleccionado (valor de App\Enums\Style); '' = todos
     categoria: '', // tema (valor de App\Enums\Category); '' = todos
     busqueda: '', // texto buscado en el nombre y la descripción; '' = sin buscar
     obras: [], // obras del estilo, tal como las da ProductResource
@@ -12,9 +12,10 @@ export const estadoInicial = Object.freeze({
 // Los filtros de un estado en forma de texto: sirve para saber si una respuesta de la API sigue valiendo
 export const claveFiltros = ({ estilo, categoria, busqueda }) => JSON.stringify([estilo, categoria, busqueda]);
 
-// Parámetros de la API (/api/products?style=…&category=…&q=…), sin los filtros vacíos
+// Parámetros de la API (/api/products?style=…&category=…&q=…), sin los filtros vacíos (sin estilo = todas)
 export function parametrosApi({ estilo, categoria, busqueda }) {
-    const parametros = new URLSearchParams({ style: estilo });
+    const parametros = new URLSearchParams();
+    if (estilo) parametros.set('style', estilo);
     if (categoria) parametros.set('category', categoria);
     if (busqueda) parametros.set('q', busqueda);
     return parametros.toString();

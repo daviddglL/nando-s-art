@@ -102,6 +102,7 @@ describe('filtros combinados', () => {
         expect(parametrosApi(filtros)).toBe('style=oleo&q=gato+%26+perro');
         expect(parametrosUrl({ ...filtros, categoria: 'retrato' })).toBe('estilo=oleo&categoria=retrato&q=gato+%26+perro');
         expect(parametrosUrl(estadoInicial)).toBe('');
+        expect(parametrosApi({ ...filtros, estilo: '' })).toBe('q=gato+%26+perro');
     });
 });
 

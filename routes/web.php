@@ -3,7 +3,9 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EncargoController;
+use App\Http\Controllers\FraseController;
 use App\Http\Controllers\GaleriaController;
+use App\Http\Controllers\MensajeContactoController;
 use App\Http\Controllers\ObraController;
 use App\Http\Controllers\ObraImagenController;
 use App\Http\Controllers\PaginaController;
@@ -11,10 +13,7 @@ use App\Http\Controllers\PortadaController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SitemapController;
-use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 // Portada, con las obras destacadas
@@ -29,31 +28,15 @@ Route::get('/obras/{obra:slug}', [ObraController::class, 'show'])->name('obras.s
 // Páginas de texto que el artista edita desde el panel
 Route::get('/sobre-mi', [PaginaController::class, 'sobreMi'])->name('paginas.sobre-mi');
 Route::get('/contacto', [PaginaController::class, 'contacto'])->name('paginas.contacto');
+Route::post('/contacto', MensajeContactoController::class)
+    ->middleware('throttle:contacto')
+    ->name('contacto.enviar');
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
-// Ruta para obtener frase del día (proxy para evitar CORS).
-// Se cachea hasta medianoche y no deja la página colgada si el servicio externo falla.
-Route::get('/frase-proxy', function () {
-    $frase = Cache::get('frase-del-dia');
-
-    if (! $frase) {
-        try {
-            $response = Http::timeout(3)->get('https://frasedeldia.azurewebsites.net/api/phrase');
-            if ($response->successful() && $response->json('phrase')) {
-                $frase = $response->json();
-                Cache::put('frase-del-dia', $frase, now()->endOfDay());
-            }
-        } catch (HttpClientException $e) {
-            report($e);
-        }
-    }
-
-    return $frase
-        ? response()->json($frase)
-        : response()->json(['message' => 'No se pudo cargar la frase del día'], 503);
-})->middleware('throttle:60,1');
+// Frase del día (proxy para evitar CORS), en un controlador para que `route:cache` funcione
+Route::get('/frase-proxy', FraseController::class)->middleware('throttle:60,1');
 
 // Autenticación (laravel/ui): login, registro (con verificación de email), recuperar y confirmar contraseña
 Auth::routes(['verify' => true]);

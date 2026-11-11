@@ -13,12 +13,12 @@ class PaginaController extends Controller
 
     public function sobreMi()
     {
-        return view('paginas.sobre-mi', ['pagina' => Pagina::obtener(Pagina::SOBRE_MI)]);
+        return view('paginas.sobre-mi', ['pagina' => Pagina::leer(Pagina::SOBRE_MI)]);
     }
 
     public function contacto()
     {
-        return view('paginas.contacto', ['pagina' => Pagina::obtener(Pagina::CONTACTO)]);
+        return view('paginas.contacto', ['pagina' => Pagina::leer(Pagina::CONTACTO)]);
     }
 
     // --- Panel del admin ---

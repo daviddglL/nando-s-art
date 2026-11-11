@@ -55,7 +55,7 @@ Configura también `MAIL_*` en `.env` (por defecto `MAIL_MAILER=log` solo los es
 
 En el `.env` del servidor: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `DB_*`, `MAIL_*`, `ADMIN_*` y `QUEUE_CONNECTION=database`.
 
-En cada despliegue:
+En cada despliegue, `./deploy.sh` desde la carpeta del proyecto. Hace estos pasos y, si alguno falla, se para y vuelve a poner la web en marcha:
 
 ```bash
 php artisan down
@@ -68,87 +68,3 @@ php artisan optimize               # cachea config, rutas, vistas y eventos
 php artisan queue:restart          # el worker recoge el código nuevo
 php artisan up
 ```
-
-`php artisan optimize` congela la configuración: tras cambiar el `.env` hay que volver a ejecutarlo (o `php artisan optimize:clear`).
-
-**OPcache.** Actívalo en el `php.ini` de producción; es lo que más acelera PHP:
-
-```ini
-opcache.enable=1
-opcache.memory_consumption=128
-opcache.max_accelerated_files=20000
-opcache.validate_timestamps=0   ; con 0 hay que recargar PHP-FPM en cada despliegue
-```
-
-**Worker de colas** (los emails van en cola). Con Supervisor, en `/etc/supervisor/conf.d/nandos-art.conf`:
-
-```ini
-[program:nandos-art-worker]
-command=php /ruta/a/nandos-art/artisan queue:work --tries=3 --max-time=3600
-autostart=true
-autorestart=true
-user=www-data
-stopwaitsecs=60
-```
-
-**Tareas programadas.** La papelera de obras se vacía sola cada noche (`model:prune` borra, con su imagen, las obras que llevan más de 30 días en ella). Para eso el servidor necesita la entrada de cron de Laravel (`crontab -e -u www-data`):
-
-```cron
-* * * * * cd /ruta/a/nandos-art && php artisan schedule:run >> /dev/null 2>&1
-```
-
-**Cabeceras de seguridad y límites.** La API (`/api/*`) admite 60 peticiones por minuto por usuario o IP. Las cabeceras las pone la propia aplicación (`App\Http\Middleware\CabecerasSeguridad`): `Content-Security-Policy` (solo scripts propios, sin JS en línea), `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` y, por HTTPS, `Strict-Transport-Security`. Si se añade un script o una imagen de otro dominio, hay que permitirlo en la CSP de ese middleware. Detrás de un proxy o balanceador con HTTPS, configura los proxies de confianza para que Laravel sepa que la petición es segura.
-
-**Copias de seguridad.** Hay que guardar la base de datos y `storage/app` (las imágenes de las obras están en `storage/app/public` y las de los presupuestos, privadas, en `storage/app/private`). Por ejemplo, cada noche con cron:
-
-```bash
-mysqldump --single-transaction nandos_art | gzip > /backups/db-$(date +%F).sql.gz
-tar -czf /backups/storage-$(date +%F).tar.gz -C /ruta/a/nandos-art storage/app
-find /backups -mtime +30 -delete
-```
-
-Y copia `/backups` fuera del servidor.
-
-## Qué puede hacer cada uno
-
-- **Visitantes**: galería por estilo, tema y búsqueda (la URL guarda el filtro, p. ej. `/galeria?estilo=oleo&categoria=retrato`), ficha de cada obra en `/obras/{slug}` (con todas sus imágenes a pantalla completa) y `sitemap.xml`.
-- **Clientes**: pedir presupuestos (con imagen de referencia, que es privada: solo la ven el cliente y el admin) y ver en "Mis presupuestos" el estado, la respuesta y el precio.
-- **Admin** (`/admin`): crear, editar, ordenar, borrar (papelera), restaurar y eliminar definitivamente obras en `/admin/obras`, cada una con varias imágenes; responder presupuestos y cambiar su estado en `/admin/encargos`.
-
-## Arquitectura (MVI)
-
-El flujo va siempre en un sentido: **vista → intent → reducer → estado → vista**.
-
-**Galería (JS, `resources/js/galeria/`)**
-
-| Fichero | Papel |
-|---|---|
-| `intents.js` | Lo que puede pasar: elegir estilo, obras cargadas, error, siguiente/anterior obra. |
-| `state.js` | Estado inicial (`estilo`, `obras`, `indice`, `cargando`, `error`) y qué tarjetas se ven. |
-| `reducer.js` | Función pura `(estado, intent) => nuevo estado`. |
-| `effects.js` | Llama a `/api/products` y devuelve el resultado como otro intent. |
-| `store.js` | Guarda el estado, aplica el reducer y avisa a la vista. |
-| `view.js` | Pinta el estado (siempre con `textContent`, nunca `innerHTML`) y enlaza cada tarjeta con su ficha. |
-| `swipe.js` | Traduce el gesto de deslizar en móvil a siguiente/anterior obra. |
-| `index.js` | Conecta botones, flechas del teclado y swipe con `dispatch()`. |
-
-**Servidor (Laravel)**
-
-- Intents: `FormRequest` en `app/Http/Requests` (validan y comprueban permisos).
-- Acciones: `app/Actions` (`CreateProduct`, `UpdateProduct`, `MoverObra`, `SolicitarPresupuesto`, `ResponderEncargo`).
-- Avisos por email: `app/Notifications` (`NuevoPresupuesto`, `PresupuestoActualizado`).
-- Estado para el front: `app/Http/Resources/ProductResource`.
-- Permisos: `app/Policies` (`ProductPolicy`, `EncargoPolicy`, `UserPolicy`).
-
-Un **encargo** (`App\Models\Encargo`) es una petición de presupuesto de un cliente. Los mensajes de validación están en español en `lang/es`.
-
-## Tests y calidad
-
-```bash
-php artisan test                 # Pest
-npm test                         # Vitest (galería MVI)
-./vendor/bin/pint --test         # formato
-./vendor/bin/phpstan analyse     # Larastan, nivel 5
-```
-
-La CI (`.github/workflows/tests.yml`) ejecuta todo esto, compila los assets y pasa `composer audit` y `npm audit`.

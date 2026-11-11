@@ -11,11 +11,11 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             // textContent en vez de innerHTML: el texto viene de un servicio externo
             const cita = document.createElement('blockquote');
-            cita.className = 'italic text-lg text-gray-700 mb-2';
-            cita.textContent = `"${data.phrase}"`;
+            cita.className = 'font-display italic text-2xl md:text-3xl leading-snug text-tinta';
+            cita.textContent = `«${data.phrase}»`;
 
             const autor = document.createElement('p');
-            autor.className = 'text-right text-sm text-gray-600';
+            autor.className = 'mt-4 text-sm text-tinta-tenue';
             autor.textContent = `— ${data.author ?? 'Anónimo'}`;
 
             fraseContainer.replaceChildren(cita, autor);
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(error => {
             console.error('Error al obtener la frase:', error);
             const aviso = document.createElement('p');
-            aviso.className = 'text-red-500';
+            aviso.className = 'text-tinta-tenue';
             aviso.textContent = 'No se pudo cargar la frase del día.';
             fraseContainer.replaceChildren(aviso);
         });

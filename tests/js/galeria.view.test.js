@@ -68,7 +68,8 @@ describe('vista de la galería', () => {
         const central = dom.carrusel.querySelector('[data-posicion="0"]');
         expect(central.querySelector('h3').textContent).toBe('Obra 2');
         expect(central.querySelector('img').getAttribute('src')).toBe('/storage/obras/2.webp');
-        expect(central.textContent).toContain('Categoría: Paisaje');
+        expect(central.textContent).toContain('Paisaje');
+        expect(central.textContent).toContain('30 × 40 cm');
         expect(dom.siguiente.disabled).toBe(false);
     });
 
@@ -79,7 +80,7 @@ describe('vista de la galería', () => {
         const conMiniaturas = dom.carrusel.querySelector('img[alt="Obra 1"]');
         const sinMiniaturas = dom.carrusel.querySelector('img[alt="Obra 2"]');
         expect(conMiniaturas.getAttribute('srcset')).toBe(srcset);
-        expect(conMiniaturas.getAttribute('sizes')).toBe('272px');
+        expect(conMiniaturas.getAttribute('sizes')).toBe('320px');
         expect(sinMiniaturas.hasAttribute('srcset')).toBe(false);
         expect(sinMiniaturas.getAttribute('src')).toBe('/storage/obras/2.webp');
     });
@@ -90,6 +91,27 @@ describe('vista de la galería', () => {
 
         expect(dom.carrusel.children).toHaveLength(3);
         expect(dom.carrusel.lastElementChild.className).toContain('invisible');
+    });
+
+    it('enseña el precio o «Vendida» en la cartela', () => {
+        const obras = [obra(1, { available: true, precio_texto: '120,00 €' }), obra(2, { available: false, precio_texto: '90,00 €' })];
+        render({ ...estadoInicial, estilo: 'acuarela', obras, indice: 0 }, dom, config);
+
+        expect(dom.carrusel.querySelector('[data-posicion="0"]').textContent).toContain('120,00 €');
+        const vendida = dom.carrusel.querySelector('[data-posicion="-1"]');
+        expect(vendida.textContent).toContain('Vendida');
+        expect(vendida.textContent).not.toContain('90,00 €');
+    });
+
+    it('con «Todas» marca su botón y usa el papel neutro', () => {
+        document.body.insertAdjacentHTML('beforeend', '<button class="filtro-estilo" data-style=""></button>');
+        dom.botones = [...document.querySelectorAll('.filtro-estilo')];
+        render({ ...estadoInicial, estilo: '' }, dom, { ...config, fondos: { ...config.fondos, '': 'bg-papel' } });
+
+        expect(dom.main.className).toContain('bg-papel');
+        expect(dom.botones[2].getAttribute('aria-pressed')).toBe('true');
+        expect(dom.botones[0].getAttribute('aria-pressed')).toBe('false');
+        expect(dom.carrusel.textContent).toContain('Todavía no hay obras en la galería');
     });
 
     it('nunca interpreta como HTML el texto de una obra', () => {

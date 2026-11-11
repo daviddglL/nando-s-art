@@ -33,8 +33,8 @@ class UserSeeder extends Seeder
             ],
         ];
 
-        // Usuario de pruebas solo en local
-        if (app()->environment('local')) {
+        // Usuario de pruebas solo si se pide con SEED_ADMIN_PRUEBAS=true, y nunca en producción
+        if (config('admin.pruebas') && ! app()->environment('production')) {
             $users[] = [
                 'name' => 'admin',
                 'email' => 'admin@example.com',

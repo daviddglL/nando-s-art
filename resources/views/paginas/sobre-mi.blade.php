@@ -5,24 +5,43 @@
     @section('og_image', $pagina->fotoUrl())
 @endif
 
+@push('head')
+    @php
+        $personaJsonLd = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Person',
+        'name' => 'Fernando Delgado',
+        'alternateName' => "Nando's Art",
+        'description' => $pagina->resumen(),
+        'image' => $pagina->fotoUrl() ?? asset('images/nandofoto-352.webp'),
+        'url' => url('/'),
+    ];
+    @endphp
+    <script type="application/ld+json">@json($personaJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP)</script>
+@endpush
+
 @section('content')
-<article class="bg-linear-to-br from-blue-100 via-purple-100 to-pink-100 py-16 px-4">
-    <div class="max-w-4xl mx-auto bg-white/80 rounded-xl shadow-lg p-6 sm:p-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-        <img src="{{ $pagina->fotoUrl() ?? asset('images/nandofoto-352.webp') }}" alt="Fernando Delgado, el artista"
-             class="w-44 h-44 md:w-full md:h-auto mx-auto rounded-full md:rounded-xl object-cover shadow-xl border-4 border-white">
+<article class="contenedor py-16 md:py-24">
+    <div class="grid grid-cols-1 md:grid-cols-[minmax(0,22rem)_1fr] gap-12 md:gap-20 items-start">
+        <figure class="md:sticky md:top-28">
+            <div class="marco rotate-[-1.5deg]">
+                <img src="{{ $pagina->fotoUrl() ?? asset('images/nandofoto-352.webp') }}" alt="Fernando Delgado, el artista"
+                     width="352" height="440" class="w-full aspect-[4/5] object-cover">
+            </div>
+            <figcaption class="mt-5 text-sm text-tinta-tenue text-center">Fernando Delgado · Nando's Art</figcaption>
+        </figure>
 
-        <div class="md:col-span-2">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 tracking-tight">{{ $pagina->titulo }}</h1>
+        <div>
+            <p class="antetitulo">El artista</p>
+            <h1 class="titulo-pagina mt-3">{{ $pagina->titulo }}</h1>
             {{-- Texto plano: los saltos de línea del panel se respetan y no se interpreta HTML --}}
-            <div class="text-gray-700 text-lg leading-relaxed whitespace-pre-line">{{ $pagina->contenido }}</div>
+            <div class="mt-10 texto-largo whitespace-pre-line first-letter:float-left first-letter:font-display first-letter:text-7xl first-letter:leading-[0.8] first-letter:mr-3 first-letter:mt-1 first-letter:text-acento">{{ $pagina->contenido }}</div>
 
-            <div class="mt-8 flex flex-wrap gap-4">
-                <a href="{{ route('galeria') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-sm">Ver la galería</a>
-                <a href="{{ route('paginas.contacto') }}" class="inline-block border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-bold py-2 px-5 rounded-lg">Contactar</a>
+            <div class="mt-12 flex flex-wrap gap-3">
+                <a href="{{ route('galeria') }}" class="btn btn-primario">Ver la galería</a>
+                <a href="{{ route('paginas.contacto') }}" class="btn btn-secundario">Contactar</a>
             </div>
         </div>
     </div>
 </article>
-
-<x-footer />
 @endsection

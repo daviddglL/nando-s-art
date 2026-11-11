@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Notification;
 
 class SolicitarPresupuesto
 {
+    public function __construct(private GuardarImagen $guardar) {}
+
     /**
      * Crea un encargo pendiente a nombre del cliente, con su imagen de referencia si la hay, y avisa al artista.
      *
@@ -19,7 +21,8 @@ class SolicitarPresupuesto
      */
     public function handle(User $cliente, array $data, ?UploadedFile $imagen = null): Encargo
     {
-        $data['imagen'] = $imagen?->store('presupuestos', Encargo::DISCO_IMAGENES) ?: null;
+        // Las fotos del móvil se guardan reducidas y derechas, en el disco privado
+        $data['imagen'] = $imagen ? 'presupuestos/'.$this->guardar->handle($imagen, 'presupuestos', Encargo::DISCO_IMAGENES) : null;
 
         // El encargo siempre pertenece al cliente que lo pide, nunca a un user_id enviado en el formulario
         unset($data['user_id']);

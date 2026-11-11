@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\ObraImagen;
 use App\Models\Product;
+use App\Support\Imagen;
 use Illuminate\Support\Facades\Storage;
 
 class GenerarMiniaturas
@@ -26,17 +27,14 @@ class GenerarMiniaturas
             return [];
         }
 
-        $original = @imagecreatefromstring((string) $disco->get($ruta));
-        if ($original === false) {
+        // Girada según su EXIF, como la ve el navegador (las fotos de móvil en vertical salían tumbadas)
+        $original = Imagen::abrir((string) $disco->get($ruta));
+        if ($original === null) {
             return [];
-        }
-        // Los GIF y PNG con paleta no se pueden guardar como WebP sin pasarlos antes a color real
-        if (! imageistruecolor($original)) {
-            imagepalettetotruecolor($original);
         }
 
         $carpeta = $obra->carpetaMiniaturas();
-        $disco->deleteDirectory($carpeta);
+        $obra->borrarMiniaturas();
 
         $anchoOriginal = imagesx($original);
         $anchos = array_values(array_unique(array_map(fn (int $ancho) => min($ancho, $anchoOriginal), self::ANCHOS)));

@@ -3,42 +3,42 @@
 @section('title', "Crear cuenta · Nando's Art")
 
 @section('content')
-<div class="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-100 via-white to-blue-200">
-    <div class="w-full max-w-3xl bg-white rounded-xl shadow-lg p-10">
-        <h2 class="text-3xl font-extrabold text-center text-gray-800 mb-8">Registro de Usuario</h2>
+<div class="flex items-center justify-center min-h-[70vh] px-5 py-16">
+    <div class="w-full max-w-3xl lamina">
+        <h1 class="font-display text-4xl text-center mb-8">Registro de Usuario</h1>
 
         <form method="POST" action="{{ route('register') }}" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             @csrf
 
             <!-- Nombre -->
             <div class="col-span-1">
-                <label for="name" class="block text-sm font-semibold text-gray-700">Nombre</label>
+                <label for="name" class="etiqueta">Nombre</label>
                 <input id="name" type="text" name="name" value="{{ old('name') }}" required
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500 @error('name') border-red-500 @enderror">
-                @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    class="campo @error('name') border-red-500 @enderror">
+                @error('name') <p class="error-campo">{{ $message }}</p> @enderror
             </div>
 
             <!-- Email -->
             <div class="col-span-1">
-                <label for="email" class="block text-sm font-semibold text-gray-700">Correo electrónico</label>
+                <label for="email" class="etiqueta">Correo electrónico</label>
                 <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror">
-                @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    class="campo @error('email') border-red-500 @enderror">
+                @error('email') <p class="error-campo">{{ $message }}</p> @enderror
             </div>
 
             <!-- Contraseña -->
             <div class="col-span-1">
-                <label for="password" class="block text-sm font-semibold text-gray-700">Contraseña</label>
+                <label for="password" class="etiqueta">Contraseña</label>
                 <input id="password" type="password" name="password" required
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500 @error('password') border-red-500 @enderror">
-                @error('password') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    class="campo @error('password') border-red-500 @enderror">
+                @error('password') <p class="error-campo">{{ $message }}</p> @enderror
             </div>
 
             <!-- Confirmar contraseña -->
             <div class="col-span-1">
-                <label for="password-confirm" class="block text-sm font-semibold text-gray-700">Confirmar contraseña</label>
+                <label for="password-confirm" class="etiqueta">Confirmar contraseña</label>
                 <input id="password-confirm" type="password" name="password_confirmation" required
-                    class="mt-1 w-full px-4 py-2 border rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500">
+                    class="campo">
             </div>
 
             {{-- Campo trampa para bots: invisible y fuera del orden de tabulación --}}
@@ -46,12 +46,12 @@
                 <label for="web">Deja este campo vacío</label>
                 <input id="web" type="text" name="web" value="" tabindex="-1" autocomplete="off">
             </div>
-            @error('web') <p class="col-span-2 text-red-500 text-sm">{{ $message }}</p> @enderror
+            @error('web') <p class="col-span-2 text-red-700 text-sm">{{ $message }}</p> @enderror
 
             <!-- Botón de registro -->
             <div class="col-span-2">
                 <button type="submit"
-                    class="w-full bg-blue-600 text-white font-semibold py-3 rounded-md hover:bg-blue-700 transition">
+                    class="btn btn-primario w-full">
                     Registrarse
                 </button>
             </div>

@@ -13,6 +13,9 @@ class PresupuestoActualizado extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    // Si el presupuesto se borra antes de enviarse el aviso, el trabajo se descarta en vez de fallar
+    public bool $deleteWhenMissingModels = true;
+
     public function __construct(public Encargo $encargo) {}
 
     /**

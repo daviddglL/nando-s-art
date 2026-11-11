@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Actions\GenerarMiniaturas;
+use App\Actions\GuardarImagen;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +16,7 @@ class ProductSeeder extends Seeder
     // Imágenes de las obras de ejemplo (versionadas en el repo). Se pueden sustituir por las fotos reales con el mismo nombre.
     public const CARPETA_IMAGENES = __DIR__.'/imagenes';
 
-    public function run(GenerarMiniaturas $miniaturas): void
+    public function run(GenerarMiniaturas $miniaturas, GuardarImagen $guardar): void
     {
         // Con el modelo (y no DB::table) para que cada obra reciba su slug y su posición
         $obras = [
@@ -76,11 +77,14 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($obras as $obra) {
-            // Se copian al disco public (storage/app/public/obras) para que la galería no salga sin fotos
-            $destino = 'obras/'.$obra['imagen'];
-            if (! Storage::disk('public')->exists($destino)) {
-                Storage::disk('public')->put($destino, (string) file_get_contents(self::CARPETA_IMAGENES.'/'.$obra['imagen']));
-            }
+            // Se copian al disco public (storage/app/public/obras), que es de donde las sirve la web.
+            // Siempre se vuelven a copiar: antes, si ya había una imagen con ese nombre se dejaba la vieja,
+            // y al cambiar las de ejemplo por las fotos reales en database/seeders/imagenes no llegaban a obras/.
+            // Las fotos grandes se guardan reducidas a 2400 px y derechas, como las que se suben desde el panel.
+            $bytes = (string) file_get_contents(self::CARPETA_IMAGENES.'/'.$obra['imagen']);
+            $mime = (string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($bytes);
+            [$contenido] = $guardar->optimizar($bytes, $mime) ?? [$bytes];
+            Storage::disk('public')->put('obras/'.$obra['imagen'], $contenido);
 
             $miniaturas->handle(Product::create($obra));
         }

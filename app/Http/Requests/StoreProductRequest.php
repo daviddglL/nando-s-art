@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Actions\GuardarImagen;
 use App\Enums\Category;
 use App\Enums\Style;
 use App\Models\Product;
@@ -41,7 +42,7 @@ class StoreProductRequest extends FormRequest
             'width' => 'required|numeric|min:0',
             'style' => ['required', Rule::enum(Style::class)],
             'category' => ['required', Rule::enum(Category::class)],
-            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:'.GuardarImagen::MAX_KB,
         ];
     }
 }

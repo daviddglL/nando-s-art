@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Encargo;
+use App\Support\Markdown;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -12,6 +13,9 @@ use Illuminate\Notifications\Notification;
 class NuevoPresupuesto extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    // Si el presupuesto se borra antes de enviarse el aviso, el trabajo se descarta en vez de fallar
+    public bool $deleteWhenMissingModels = true;
 
     public function __construct(public Encargo $encargo) {}
 
@@ -33,7 +37,7 @@ class NuevoPresupuesto extends Notification implements ShouldQueue
             ->line($encargo->user->name.' ('.$encargo->user->email.') ha pedido un presupuesto.')
             ->line('Técnica: '.($encargo->styleEnum()?->label() ?? $encargo->style).' · Tema: '.($encargo->categoryEnum()?->label() ?? $encargo->category))
             ->line('Medidas: '.$encargo->height.' x '.$encargo->width.' cm')
-            ->line('«'.$encargo->description.'»')
+            ->line('«'.Markdown::escapar($encargo->description).'»')
             ->action('Ver y responder', route('encargos.show', $encargo))
             ->salutation('Nando\'s Art');
     }
