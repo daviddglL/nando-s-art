@@ -7,7 +7,7 @@ use Illuminate\Http\UploadedFile;
 
 class CreateProduct
 {
-    public function __construct(private GenerarMiniaturas $miniaturas) {}
+    public function __construct(private GenerarMiniaturas $miniaturas, private GuardarImagen $guardar) {}
 
     /**
      * Guarda la imagen, crea la obra y genera sus miniaturas WebP.
@@ -17,8 +17,8 @@ class CreateProduct
     public function handle(array $data, UploadedFile $imagen): Product
     {
         // Nombre aleatorio: el cliente no decide el nombre y dos obras nunca comparten imagen.
-        // Se guarda en storage/app/public/obras (visible en /storage/obras con `php artisan storage:link`)
-        $data['imagen'] = basename((string) $imagen->store('obras', 'public'));
+        // Se guarda reducida (GuardarImagen) en storage/app/public/obras (visible en /storage/obras con `php artisan storage:link`)
+        $data['imagen'] = $this->guardar->handle($imagen, 'obras');
 
         $obra = Product::create($data);
         $this->miniaturas->handle($obra);

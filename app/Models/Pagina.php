@@ -47,10 +47,18 @@ class Pagina extends Model
         return is_string($value) && isset(self::POR_DEFECTO[$value]) ? static::obtener($value) : null;
     }
 
-    // Devuelve la página guardada o la crea con su contenido por defecto
+    // Devuelve la página guardada o la crea con su contenido por defecto (solo desde el panel)
     public static function obtener(string $slug): self
     {
         return static::firstOrCreate(['slug' => $slug], self::POR_DEFECTO[$slug]);
+    }
+
+    // Para las páginas públicas, la portada y el footer: lee la página sin escribir nada en la base de datos.
+    // Si el artista aún no la ha editado, sale con el contenido por defecto.
+    public static function leer(string $slug): self
+    {
+        return static::firstWhere('slug', $slug)
+            ?? (new self)->forceFill(['slug' => $slug] + self::POR_DEFECTO[$slug]);
     }
 
     /**

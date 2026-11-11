@@ -7,7 +7,7 @@ use Illuminate\Http\UploadedFile;
 
 class UpdateProduct
 {
-    public function __construct(private GenerarMiniaturas $miniaturas) {}
+    public function __construct(private GenerarMiniaturas $miniaturas, private GuardarImagen $guardar) {}
 
     /**
      * Guarda los cambios de una obra. Si llega una imagen nueva, sustituye a la anterior,
@@ -21,7 +21,7 @@ class UpdateProduct
         $anterior = $obra->replicate();
 
         if ($imagen) {
-            $data['imagen'] = basename((string) $imagen->store('obras', 'public'));
+            $data['imagen'] = $this->guardar->handle($imagen, 'obras');
         }
 
         $obra->update($data);

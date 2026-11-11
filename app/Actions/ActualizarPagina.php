@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ActualizarPagina
 {
+    public function __construct(private GuardarImagen $guardar) {}
+
     /**
      * Guarda el texto de una página. La foto nueva sustituye a la anterior y borra su fichero;
      * con $quitarFoto se elimina sin poner otra.
@@ -20,7 +22,7 @@ class ActualizarPagina
         unset($data['foto'], $data['quitar_foto']);
 
         if ($foto) {
-            $data['foto'] = basename((string) $foto->store('paginas', 'public'));
+            $data['foto'] = $this->guardar->handle($foto, 'paginas');
         } elseif ($quitarFoto) {
             $data['foto'] = null;
         }

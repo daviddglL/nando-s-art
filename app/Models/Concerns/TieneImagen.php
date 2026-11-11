@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Storage;
  */
 trait TieneImagen
 {
+    /** @var array<string, list<int>> anchos de miniaturas ya leídos del disco, por nombre de imagen */
+    protected array $anchosLeidos = [];
+
     public function imagenUrl(): string
     {
         return asset('storage/obras/'.rawurlencode((string) $this->imagen));
@@ -34,13 +37,18 @@ trait TieneImagen
             return [];
         }
 
+        // Se lee el disco una vez por modelo (antes, una por cada srcset o miniatura que se pintaba)
+        if (isset($this->anchosLeidos[$this->imagen])) {
+            return $this->anchosLeidos[$this->imagen];
+        }
+
         $anchos = array_map(
             fn (string $fichero) => (int) pathinfo($fichero, PATHINFO_FILENAME),
             Storage::disk('public')->files($this->carpetaMiniaturas()),
         );
         sort($anchos);
 
-        return array_values(array_filter($anchos));
+        return $this->anchosLeidos[$this->imagen] = array_values(array_filter($anchos));
     }
 
     // Valor del atributo srcset ("…/400.webp 400w, …/800.webp 800w"); null si no hay miniaturas
@@ -60,8 +68,19 @@ trait TieneImagen
         return $ancho ? asset('storage/'.$this->carpetaMiniaturas()."/{$ancho}.webp") : $this->imagenUrl();
     }
 
+    // La miniatura más grande (1600 px): para el visor a pantalla completa y al compartir en redes.
+    // La original puede pesar varios MB y no se ve mejor en una pantalla normal.
+    public function imagenGrandeUrl(): string
+    {
+        $anchos = $this->anchosMiniaturas();
+        $ancho = end($anchos);
+
+        return $ancho ? asset('storage/'.$this->carpetaMiniaturas()."/{$ancho}.webp") : $this->imagenUrl();
+    }
+
     public function borrarMiniaturas(): void
     {
+        $this->anchosLeidos = [];
         if ($this->imagen) {
             Storage::disk('public')->deleteDirectory($this->carpetaMiniaturas());
         }

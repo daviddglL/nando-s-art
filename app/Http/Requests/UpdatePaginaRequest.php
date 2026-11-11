@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Actions\GuardarImagen;
 use Illuminate\Foundation\Http\FormRequest;
 
 // Intent "editar página" del admin: título, texto y, según la página, foto o datos de contacto
@@ -32,7 +33,7 @@ class UpdatePaginaRequest extends FormRequest
         }
 
         return $reglas + [
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:'.GuardarImagen::MAX_KB,
             'quitar_foto' => 'boolean',
         ];
     }

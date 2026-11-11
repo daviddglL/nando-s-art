@@ -2,7 +2,7 @@
 @section('title', "{$obra->name} · Nando's Art")
 @section('description', Str::limit($obra->description, 155))
 @section('og_type', 'article')
-@section('og_image', $obra->imagenUrl())
+@section('og_image', $obra->imagenGrandeUrl())
 
 @section('content')
 @php
@@ -89,8 +89,9 @@
 <dialog id="visor-obra" class="m-auto max-w-none max-h-none w-screen h-screen bg-black/90 p-4 backdrop:bg-black/80" aria-label="{{ $obra->name }} a pantalla completa">
     <button type="button" data-lightbox-cerrar class="absolute top-4 right-4 z-10 text-white text-3xl leading-none px-3 py-1 rounded-sm hover:bg-white/10" aria-label="Cerrar">×</button>
     @foreach ($imagenes as $imagen)
-        <img data-lightbox-imagen src="{{ $imagen->imagenUrl() }}" alt="{{ $obra->name }}{{ $imagenes->count() > 1 ? " ({$loop->iteration} de {$imagenes->count()})" : '' }}"
-             @if (! $loop->first) hidden loading="lazy" @endif class="w-full h-full object-contain">
+        {{-- La de 1600 px y no la original (puede pesar varios MB); lazy: no se descarga hasta abrir el visor --}}
+        <img data-lightbox-imagen src="{{ $imagen->imagenGrandeUrl() }}" alt="{{ $obra->name }}{{ $imagenes->count() > 1 ? " ({$loop->iteration} de {$imagenes->count()})" : '' }}"
+             loading="lazy" @if (! $loop->first) hidden @endif class="w-full h-full object-contain">
     @endforeach
     @if ($imagenes->count() > 1)
         <button type="button" data-lightbox-anterior class="absolute left-2 top-1/2 -translate-y-1/2 text-white text-4xl leading-none px-3 py-2 rounded-sm hover:bg-white/10" aria-label="Imagen anterior">‹</button>

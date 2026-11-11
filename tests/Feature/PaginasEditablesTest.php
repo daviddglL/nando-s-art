@@ -24,7 +24,8 @@ test('las páginas sobre mí y contacto se ven con su texto por defecto y salen 
         ->assertSee('href="'.route('paginas.sobre-mi').'"', false)
         ->assertSee('href="'.route('paginas.contacto').'"', false);
 
-    expect(Pagina::count())->toBe(2);
+    // Las visitas públicas no escriben en la base de datos: las filas las crea el panel al editar
+    expect(Pagina::count())->toBe(0);
 });
 
 test('el texto de las páginas no interpreta HTML y respeta los saltos de línea', function () {

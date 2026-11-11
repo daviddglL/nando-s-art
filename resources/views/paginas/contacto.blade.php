@@ -29,6 +29,35 @@
             </dl>
         @endif
 
+        {{-- Para escribir sin crear una cuenta (MensajeContactoController) --}}
+        <form id="formulario-contacto" method="POST" action="{{ route('contacto.enviar') }}" class="mt-10 space-y-4">
+            @csrf
+            <h2 class="text-xl font-semibold text-gray-800">Escríbeme</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="contacto-nombre" class="block text-gray-700 font-semibold mb-1">Nombre</label>
+                    <input id="contacto-nombre" name="nombre" value="{{ old('nombre') }}" required maxlength="100" autocomplete="name" class="w-full px-4 py-2 border border-gray-300 rounded-md">
+                    @error('nombre') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="contacto-email" class="block text-gray-700 font-semibold mb-1">Email</label>
+                    <input id="contacto-email" type="email" name="email" value="{{ old('email') }}" required maxlength="255" autocomplete="email" class="w-full px-4 py-2 border border-gray-300 rounded-md">
+                    @error('email') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+            <div>
+                <label for="contacto-mensaje" class="block text-gray-700 font-semibold mb-1">Mensaje</label>
+                <textarea id="contacto-mensaje" name="mensaje" rows="5" required minlength="10" maxlength="5000" class="w-full px-4 py-2 border border-gray-300 rounded-md">{{ old('mensaje') }}</textarea>
+                @error('mensaje') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+            {{-- Campo trampa: oculto para las personas, los bots lo rellenan --}}
+            <div class="hidden" aria-hidden="true">
+                <label for="contacto-web">Deja este campo vacío</label>
+                <input id="contacto-web" type="text" name="web" value="" tabindex="-1" autocomplete="off">
+            </div>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">Enviar mensaje</button>
+        </form>
+
         <div class="mt-10 p-6 rounded-lg bg-linear-to-r from-blue-200 via-purple-100 to-pink-200">
             <h2 class="text-xl font-semibold text-gray-800 mb-2">¿Tienes una idea para un encargo?</h2>
             <p class="text-gray-700 mb-4">Cuéntamela con medidas, estilo y una imagen de referencia, y te respondo con un presupuesto.</p>

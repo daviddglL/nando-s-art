@@ -80,6 +80,18 @@ opcache.max_accelerated_files=20000
 opcache.validate_timestamps=0   ; con 0 hay que recargar PHP-FPM en cada despliegue
 ```
 
+**Fotos grandes.** El panel acepta fotos de hasta 15 MB y las guarda reducidas a 2400 px y derechas (EXIF). El servidor tiene que dejarlas pasar: `public/.user.ini` ya lo pide en los hostings con PHP-FPM, y si no, en el `php.ini`:
+
+```ini
+upload_max_filesize=16M
+post_max_size=64M      ; en "Más imágenes" se suben varias a la vez
+memory_limit=256M
+```
+
+Con Nginx, además, `client_max_body_size 64m;` en el `server`. PHP necesita las extensiones `gd` (con WebP) y `exif`.
+
+**Producción en el `.env`:** `APP_ENV=production`, `APP_DEBUG=false`, `SESSION_SECURE_COOKIE=true`, un `MAIL_FROM_ADDRESS` real, `TRUSTED_PROXIES` si hay Cloudflare o un balanceador y `CONTACTO_EMAIL` si los mensajes de `/contacto` deben ir a otro correo. `SEED_ADMIN_PRUEBAS` solo en local.
+
 **Worker de colas** (los emails van en cola). Con Supervisor, en `/etc/supervisor/conf.d/nandos-art.conf`:
 
 ```ini

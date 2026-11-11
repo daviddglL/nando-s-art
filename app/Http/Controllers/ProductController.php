@@ -38,10 +38,13 @@ class ProductController extends Controller
 
         // Las búsquedas de texto no se cachean: cada texto distinto llenaría la caché
         if ($busqueda = trim($filtros['q'] ?? '')) {
-            $patron = '%'.$busqueda.'%';
+            // % y _ se buscan como texto, no como comodines (buscar «%» ya no devuelve todas las obras)
+            $patron = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $busqueda).'%';
 
             return ProductResource::collection($consulta
-                ->where(fn ($query) => $query->whereLike('name', $patron)->orWhereLike('description', $patron))
+                ->where(fn ($query) => $query
+                    ->whereRaw("name like ? escape '!'", [$patron])
+                    ->orWhereRaw("description like ? escape '!'", [$patron]))
                 ->get());
         }
 
