@@ -3,27 +3,27 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto my-10 px-4">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Hola, {{ $user->name }}</h1>
+    <h1 class="titulo-seccion mb-8">Hola, {{ $user->name }}</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <a href="{{ route('admin.obras.index') }}" class="block bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
-            <span class="block text-3xl font-bold text-gray-800">{{ $resumen['obras'] }}</span>
-            <span class="text-gray-600">obras en la galería</span>
+        <a href="{{ route('admin.obras.index') }}" class="block lamina sm:p-7 hover:-translate-y-0.5 hover:shadow-flotante transition">
+            <span class="block text-3xl font-bold text-tinta">{{ $resumen['obras'] }}</span>
+            <span class="text-tinta-suave">obras en la galería</span>
         </a>
-        <a href="{{ route('encargos.index', ['estado' => 'pending']) }}" class="block bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
-            <span class="block text-3xl font-bold text-pink-700">{{ $resumen['pendientes'] }}</span>
-            <span class="text-gray-600">presupuestos sin responder</span>
+        <a href="{{ route('encargos.index', ['estado' => 'pending']) }}" class="block lamina sm:p-7 hover:-translate-y-0.5 hover:shadow-flotante transition">
+            <span class="block text-3xl font-bold text-acento">{{ $resumen['pendientes'] }}</span>
+            <span class="text-tinta-suave">presupuestos sin responder</span>
         </a>
-        <a href="{{ route('encargos.index') }}" class="block bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition">
-            <span class="block text-3xl font-bold text-gray-800">{{ $resumen['encargos'] }}</span>
-            <span class="text-gray-600">presupuestos en total</span>
+        <a href="{{ route('encargos.index') }}" class="block lamina sm:p-7 hover:-translate-y-0.5 hover:shadow-flotante transition">
+            <span class="block text-3xl font-bold text-tinta">{{ $resumen['encargos'] }}</span>
+            <span class="text-tinta-suave">presupuestos en total</span>
         </a>
     </div>
 
-    <a href="{{ route('products.create') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm">
+    <a href="{{ route('products.create') }}" class="btn btn-primario">
         + Nueva obra
     </a>
-    <a href="{{ route('admin.paginas.index') }}" class="inline-block ml-2 py-2 px-4 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 font-bold shadow-sm">
+    <a href="{{ route('admin.paginas.index') }}" class="inline-block ml-2 py-2 px-4 rounded-lg border border-linea bg-papel-claro text-tinta-suave hover:bg-papel font-bold shadow-sm">
         Editar «Sobre mí» y «Contacto»
     </a>
 </div>

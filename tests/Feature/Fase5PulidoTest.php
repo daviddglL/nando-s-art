@@ -127,7 +127,7 @@ test('la galería lee los filtros de la URL e ignora los que no existen', functi
 
     $this->get('/galeria?estilo=nada&categoria=nada')
         ->assertOk()
-        ->assertSee('"estiloInicial":"acuarela"', false)
+        ->assertSee('"estiloInicial":""', false)
         ->assertSee('"categoriaInicial":""', false);
 });
 

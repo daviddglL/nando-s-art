@@ -252,7 +252,7 @@ test('la CSP no permite scripts en línea ni de otros dominios, y las vistas no 
         ->and(CabecerasSeguridad::CSP)->toContain("frame-ancestors 'none'");
 
     $vistas = collect(File::allFiles(resource_path('views')))
-        ->filter(fn ($fichero) => preg_match('/\son[a-z]+="|<script(?![^>]*application\/json)[^>]*>\s*\S/', $fichero->getContents()))
+        ->filter(fn ($fichero) => preg_match('/\son[a-z]+="|<script(?![^>]*application\/(ld\+)?json)[^>]*>\s*\S/', $fichero->getContents()))
         ->map->getRelativePathname();
 
     expect($vistas->all())->toBe([]);

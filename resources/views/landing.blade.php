@@ -2,88 +2,135 @@
 @section('title', "Nando's Art · Acuarelas y retratos de Fernando Delgado")
 @section('description', 'Acuarelas, retratos y paisajes de Fernando Delgado. Descubre sus obras originales y pide un encargo personalizado.')
 
+@push('head')
+    {{-- Datos estructurados: Google entiende que la web es de un artista y quién es --}}
+    @php
+        $personaJsonLd = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Person',
+        'name' => 'Fernando Delgado',
+        'alternateName' => "Nando's Art",
+        'jobTitle' => 'Artista',
+        'url' => url('/'),
+        'image' => $sobreMi->fotoUrl() ?? asset('images/nandofoto-352.webp'),
+        'sameAs' => array_values(array_filter([$contacto->instagram])),
+    ];
+    @endphp
+    <script type="application/ld+json">@json($personaJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP)</script>
+@endpush
+
 @section('content')
-{{-- El <main> ya lo pone el layout --}}
-<div class="flex flex-col items-center justify-center min-h-screen bg-linear-to-br from-blue-100 via-purple-100 to-pink-100 py-16 px-4">
-    <!-- Imagen redonda con borde animado -->
-    <div class="relative mb-8">
-        <div class="absolute inset-0 rounded-full bg-linear-to-tr from-blue-300 via-pink-200 to-purple-300 blur-lg opacity-60 animate-pulse"></div>
-        <img src="{{ asset('images/nandofoto-352.webp') }}" alt="Fernando Delgado, el artista" width="176" height="176" class="w-44 h-44 rounded-full object-cover shadow-2xl border-4 border-white relative z-10">
-    </div>
-
-    <!-- Biografía -->
-    <div class="max-w-3xl bg-white/70 backdrop-blur-md rounded-xl shadow-lg p-8 mb-8">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4 tracking-tight">¡Bienvenido a mi espacio creativo!</h1>
-        <p class="text-gray-700 text-lg leading-relaxed">
-            Soy un apasionado del arte y el diseño con años de experiencia en distintas técnicas y estilos. Desde acuarelas suaves hasta trazos marcados con rotulador, cada obra cuenta una historia distinta. En este sitio comparto mi trabajo, mi evolución y mis ideas. Gracias por acompañarme en este viaje visual, donde cada imagen busca inspirar, provocar y emocionar.
-        </p>
-    </div>
-
-    <!-- Frase del día -->
-    <div class="w-full max-w-xl bg-linear-to-r from-blue-200 via-purple-100 to-pink-200 rounded-lg shadow-sm p-6 mb-12">
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Frase del Día</h2>
-       <div id="frase-del-dia" class="mt-8 text-center px-4"></div>
-
-    </div>
-
-    {{-- Obras destacadas: las marca el admin en /admin/obras --}}
-    @if ($destacadas->isNotEmpty())
-        <section class="w-full max-w-5xl mb-16" aria-labelledby="titulo-destacadas">
-            <h2 id="titulo-destacadas" class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Obras destacadas</h2>
-            <ul class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                @foreach ($destacadas as $obra)
-                    <li>
-                        <a href="{{ route('obras.show', $obra->slug) }}" class="block group bg-white/80 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
-                            <img src="{{ $obra->imagenUrl() }}" @if ($obra->srcset()) srcset="{{ $obra->srcset() }}" sizes="(min-width: 768px) 320px, 50vw" @endif alt="{{ $obra->name }}" loading="lazy" class="w-full aspect-square object-cover">
-                            <span class="block px-3 pt-2 font-semibold text-gray-800 group-hover:underline">{{ $obra->name }}</span>
-                            <span class="block px-3 pb-3 text-sm text-gray-600">{{ $obra->available ? $obra->precioTexto() : 'Vendida' }}</span>
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
-            <p class="text-center mt-6">
-                <a href="{{ route('galeria') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-sm">Ver toda la galería</a>
-            </p>
-        </section>
-    @endif
-
-    <!-- Sección Zig-Zag -->
-    <section class="mt-8 space-y-20 max-w-5xl w-full">
-        <!-- Bloque 1 -->
-        <div class="flex flex-col md:flex-row items-center md:space-x-10 bg-white/80 rounded-xl shadow-lg p-6 hover:scale-[1.02] transition-transform duration-300">
-            <img src="{{ asset('images/mujer-960.webp') }}"
-                 srcset="{{ asset('images/mujer-480.webp') }} 480w, {{ asset('images/mujer-960.webp') }} 960w"
-                 sizes="(min-width: 1024px) 460px, (min-width: 768px) 45vw, 90vw"
-                 alt="Retrato en acuarela de un hombre mayor de perfil, con turbante rojo y barba blanca sobre un fondo gris oscuro" loading="lazy" class="w-full md:w-1/2 rounded-lg shadow-lg mb-4 md:mb-0">
-            <p class="text-gray-700 text-lg leading-relaxed md:w-1/2">
-                Esta obra refleja la serenidad de los paisajes naturales, capturada con acuarela. Las capas sutiles de color dan vida a cada rincón del cuadro.
-            </p>
+{{-- Portada: el nombre del artista y un pequeño collage de tres de sus obras --}}
+<section class="relative overflow-hidden grano">
+    <div class="contenedor grid lg:grid-cols-[1.05fr_1fr] gap-14 lg:gap-10 items-center pt-14 pb-20 lg:pt-20 lg:pb-28">
+        <div class="motion-safe:animate-aparecer">
+            <p class="antetitulo">Acuarela · Retrato · Paisaje</p>
+            <h1 class="mt-5 font-display text-[clamp(3rem,8vw,6.5rem)] leading-[0.95] font-medium tracking-tight">
+                Fernando<br><span class="italic text-acento">Delgado</span>
+            </h1>
+            <p class="mt-7 max-w-md texto-largo">Obras originales en acuarela, óleo y rotulador: retratos, paisajes y encargos hechos a mano.</p>
+            <div class="mt-9 flex flex-wrap gap-3">
+                <a href="{{ route('galeria') }}" class="btn btn-primario">Ver la galería <span aria-hidden="true">→</span></a>
+                <a href="{{ route('encargos.create') }}" class="btn btn-secundario">Pedir un encargo</a>
+            </div>
         </div>
 
-        <!-- Bloque 2 (invertido) -->
-        <div class="flex flex-col md:flex-row-reverse items-center md:space-x-10 md:space-x-reverse bg-white/80 rounded-xl shadow-lg p-6 hover:scale-[1.02] transition-transform duration-300">
-            <img src="{{ asset('images/zig2-960.webp') }}"
-                 srcset="{{ asset('images/zig2-480.webp') }} 480w, {{ asset('images/zig2-960.webp') }} 960w"
-                 sizes="(min-width: 1024px) 460px, (min-width: 768px) 45vw, 90vw"
-                 alt="Retrato en acuarela de un hombre con gorra gris y barba canosa, mirando hacia la derecha" loading="lazy" class="w-full md:w-1/2 rounded-lg shadow-lg mb-4 md:mb-0">
-            <p class="text-gray-700 text-lg leading-relaxed md:w-1/2">
-                Una explosión de color y energía. Este estilo a rotulador crea líneas fuertes que exploran el dinamismo del movimiento urbano.
-            </p>
+        <div class="relative h-[26rem] sm:h-[32rem] lg:h-[36rem]" aria-label="Algunas obras de Fernando Delgado" role="group">
+            <figure class="absolute left-0 top-6 w-[58%] marco -rotate-3 motion-safe:animate-aparecer [animation-delay:120ms]">
+                <img src="{{ asset('images/mujer-960.webp') }}"
+                     srcset="{{ asset('images/mujer-480.webp') }} 480w, {{ asset('images/mujer-960.webp') }} 960w"
+                     sizes="(min-width: 1024px) 330px, 55vw" width="960" height="1200"
+                     alt="Retrato en acuarela de un hombre mayor de perfil, con turbante rojo y barba blanca sobre un fondo gris oscuro"
+                     class="w-full h-auto aspect-[4/5] object-cover">
+            </figure>
+            <figure class="absolute right-0 top-0 w-[46%] marco rotate-2 motion-safe:animate-aparecer [animation-delay:240ms]">
+                <img src="{{ asset('images/zig2-960.webp') }}"
+                     srcset="{{ asset('images/zig2-480.webp') }} 480w, {{ asset('images/zig2-960.webp') }} 960w"
+                     sizes="(min-width: 1024px) 260px, 45vw" width="960" height="960"
+                     alt="Retrato en acuarela de un hombre con gorra gris y barba canosa, mirando hacia la derecha"
+                     class="w-full h-auto aspect-square object-cover">
+            </figure>
+            <figure class="absolute right-[6%] bottom-0 w-[52%] marco -rotate-1 motion-safe:animate-aparecer [animation-delay:360ms]">
+                <img src="{{ asset('images/zig3-960.webp') }}"
+                     srcset="{{ asset('images/zig3-480.webp') }} 480w, {{ asset('images/zig3-960.webp') }} 960w"
+                     sizes="(min-width: 1024px) 300px, 50vw" width="960" height="720" loading="lazy"
+                     alt="Paisaje en acuarela de unas casas blancas junto a un río en calma, con hierba alta y cielo gris"
+                     class="w-full h-auto aspect-[4/3] object-cover">
+            </figure>
         </div>
+    </div>
+</section>
 
-        <!-- Bloque 3 -->
-        <div class="flex flex-col md:flex-row items-center md:space-x-10 bg-white/80 rounded-xl shadow-lg p-6 hover:scale-[1.02] transition-transform duration-300">
-            <img src="{{ asset('images/zig3-960.webp') }}"
-                 srcset="{{ asset('images/zig3-480.webp') }} 480w, {{ asset('images/zig3-960.webp') }} 960w"
-                 sizes="(min-width: 1024px) 460px, (min-width: 768px) 45vw, 90vw"
-                 alt="Paisaje en acuarela de unas casas blancas junto a un río en calma, con hierba alta y cielo gris" loading="lazy" class="w-full md:w-1/2 rounded-lg shadow-lg mb-4 md:mb-0">
-            <p class="text-gray-700 text-lg leading-relaxed md:w-1/2">
-                Con una técnica más abstracta, esta pieza en óleo juega con la textura y la intuición para transmitir emociones puras e instintivas.
-            </p>
+{{-- Obras destacadas: las marca el admin en /admin/obras --}}
+@if ($destacadas->isNotEmpty())
+    <section class="contenedor py-20" aria-labelledby="titulo-destacadas">
+        <div class="flex flex-wrap items-end justify-between gap-6 mb-10">
+            <div>
+                <p class="antetitulo">Selección del artista</p>
+                <h2 id="titulo-destacadas" class="titulo-seccion mt-3">Obras destacadas</h2>
+            </div>
+            <a href="{{ route('galeria') }}" class="enlace">Ver toda la galería →</a>
         </div>
+        <ul class="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-12 md:gap-x-8">
+            @foreach ($destacadas as $obra)
+                <li @class(['lg:translate-y-10' => $loop->iteration % 3 === 2])>
+                    <a href="{{ route('obras.show', $obra->slug) }}" class="group block">
+                        <div class="marco transition duration-500 group-hover:-translate-y-1 group-hover:shadow-flotante">
+                            <img src="{{ $obra->imagenUrl() }}" @if ($obra->srcset()) srcset="{{ $obra->srcset() }}" sizes="(min-width: 1024px) 340px, 45vw" @endif alt="{{ $obra->name }}" loading="lazy" class="w-full aspect-[4/5] object-cover">
+                        </div>
+                        {{-- Cartela, como en una exposición --}}
+                        <span class="mt-4 block font-display text-xl leading-snug group-hover:text-acento transition">{{ $obra->name }}</span>
+                        <span class="mt-1 block text-sm text-tinta-tenue">{{ $obra->style->label() }} · {{ $obra->category->label() }}</span>
+                        <span class="mt-2 block text-sm font-semibold">{{ $obra->available ? $obra->precioTexto() : 'Vendida' }}</span>
+                    </a>
+                </li>
+            @endforeach
+        </ul>
     </section>
+@endif
 
-</div>
+{{-- El artista: foto y comienzo del texto de «Sobre mí», que edita en el panel --}}
+<section class="bg-papel-oscuro/60 border-y border-linea">
+    <div class="contenedor py-20 grid md:grid-cols-[minmax(0,20rem)_1fr] gap-12 items-center">
+        <img src="{{ $sobreMi->fotoUrl() ?? asset('images/nandofoto-352.webp') }}" alt="Fernando Delgado, el artista"
+             width="352" height="352" loading="lazy"
+             class="w-56 md:w-full aspect-square object-cover rounded-full mx-auto shadow-cuadro ring-8 ring-papel-claro">
+        <div>
+            <p class="antetitulo">El artista</p>
+            <h2 class="titulo-seccion mt-3">{{ $sobreMi->titulo }}</h2>
+            <p class="mt-6 texto-largo max-w-2xl whitespace-pre-line">{{ $presentacion }}</p>
+            <a href="{{ route('paginas.sobre-mi') }}" class="enlace inline-block mt-6">Seguir leyendo →</a>
+        </div>
+    </div>
+</section>
 
-<x-footer />
+{{-- Frase del día (resources/js/frase.js) --}}
+<section class="contenedor py-20 text-center" aria-labelledby="titulo-frase">
+    <h2 id="titulo-frase" class="antetitulo">Frase del día</h2>
+    <div id="frase-del-dia" class="mt-6 max-w-3xl mx-auto min-h-24" aria-live="polite"></div>
+</section>
+
+{{-- Cómo funciona un encargo --}}
+<section class="contenedor pb-8" aria-labelledby="titulo-encargos">
+    <div class="lamina grid lg:grid-cols-[1fr_1.6fr] gap-10 items-center">
+        <div>
+            <p class="antetitulo">Por encargo</p>
+            <h2 id="titulo-encargos" class="titulo-seccion mt-3">Una obra pensada para ti</h2>
+            <p class="mt-4 text-tinta-suave">Un retrato, tu mascota, el paisaje de tu pueblo… Cuéntame la idea y te digo cuánto costaría, sin compromiso.</p>
+        </div>
+        <ol class="grid sm:grid-cols-3 gap-6">
+            @foreach ([
+                ['Cuéntame la idea', 'Medidas, técnica y, si quieres, una foto de referencia.'],
+                ['Recibe el presupuesto', 'Te respondo con el precio y los detalles en tu cuenta y por email.'],
+                ['Manos a la obra', 'Si te encaja, me pongo a pintar tu cuadro.'],
+            ] as [$paso, $texto])
+                <li class="border-t border-tinta/15 pt-4">
+                    <span class="font-display text-3xl italic text-acento">{{ $loop->iteration }}</span>
+                    <h3 class="mt-2 font-sans text-base font-semibold">{{ $paso }}</h3>
+                    <p class="mt-1 text-sm text-tinta-suave">{{ $texto }}</p>
+                </li>
+            @endforeach
+        </ol>
+    </div>
+</section>
 @endsection

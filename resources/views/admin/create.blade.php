@@ -2,15 +2,15 @@
 @section('title', "Nueva obra · Nando's Art")
 
 @section('content')
-    <div class="max-w-2xl mx-auto my-10 bg-white p-6 sm:p-8 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Formulario de Nueva Obra</h1>
+    <div class="max-w-2xl mx-auto my-14 lamina">
+        <h1 class="font-display text-4xl text-center mb-8">Formulario de Nueva Obra</h1>
 
         <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @include('admin.obras.campos', ['obra' => null])
 
             <div class="text-center">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-sm">
+                <button type="submit" class="btn btn-primario">
                     Guardar
                 </button>
             </div>

@@ -10,11 +10,11 @@ use Illuminate\Support\Str;
 class GaleriaController extends Controller
 {
     // Los filtros llegan en la URL (/galeria?estilo=oleo&categoria=retrato&q=gato) para poder compartirlos;
-    // un valor que no existe se ignora y sale el filtro por defecto
+    // un valor que no existe se ignora. Sin estilo se ven todas las obras (botón «Todas»)
     public function index(Request $request)
     {
         return view('galeria', [
-            'estilo' => Style::tryFrom((string) $request->query('estilo')) ?? Style::Acuarela,
+            'estilo' => Style::tryFrom((string) $request->query('estilo')),
             'categoria' => Category::tryFrom((string) $request->query('categoria')),
             'busqueda' => Str::limit(trim((string) $request->query('q')), 100, ''),
         ]);

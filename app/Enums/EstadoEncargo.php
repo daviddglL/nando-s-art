@@ -24,9 +24,9 @@ enum EstadoEncargo: string
     public function badgeClasses(): string
     {
         return match ($this) {
-            self::Pending => 'bg-yellow-100 text-yellow-900',
-            self::Reviewed => 'bg-blue-100 text-blue-900',
-            self::Completed => 'bg-green-100 text-green-900',
+            self::Pending => 'bg-acento-claro text-acento-oscuro',
+            self::Reviewed => 'bg-[#dde8ee] text-[#21465a]',
+            self::Completed => 'bg-salvia/15 text-[#3e5443]',
         };
     }
 }

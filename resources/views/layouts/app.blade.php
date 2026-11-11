@@ -10,97 +10,111 @@
     <meta name="description" content="@yield('description', 'Galería de Nando\'s Art: acuarela, óleo, rotulador y más. Obras originales y encargos personalizados.')">
     <link rel="canonical" href="{{ url()->current() }}">
     <meta property="og:site_name" content="Nando's Art">
+    <meta property="og:locale" content="es_ES">
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:title" content="@yield('title', "Nando's Art")">
     <meta property="og:description" content="@yield('description', 'Galería de Nando\'s Art: acuarela, óleo, rotulador y más. Obras originales y encargos personalizados.')">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="@yield('og_image', asset('images/mujer.webp'))">
+    <meta property="og:image" content="@yield('og_image', asset('images/mujer-960.webp'))">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#f7f2ea">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('head')
 </head>
-<body id="body-app" class="bg-gray-100 min-h-screen">
+@php
+    // Enlaces del menú principal: [ruta, texto, rutas que lo marcan como página actual]
+    $menu = [
+        ['landing', 'Inicio', ['landing']],
+        ['galeria', 'Galería', ['galeria', 'obras.*']],
+        ['paginas.sobre-mi', 'Sobre mí', ['paginas.sobre-mi']],
+        ['paginas.contacto', 'Contacto', ['paginas.contacto']],
+    ];
+    $panel = [
+        ['admin', 'Resumen', ['admin']],
+        ['admin.obras.index', 'Obras', ['admin.obras.*', 'products.create']],
+        ['encargos.index', 'Presupuestos', ['encargos.index']],
+        ['admin.paginas.index', 'Páginas', ['admin.paginas.*']],
+    ];
+@endphp
+<body class="min-h-screen flex flex-col bg-papel text-tinta">
+    <a href="#contenido" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 btn btn-primario">Saltar al contenido</a>
 
-    <!-- NAVBAR -->
-    <nav class="bg-linear-to-r from-blue-100 to-pink-100 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center py-4">
-            <a href="{{ url('/') }}" class="text-2xl font-bold text-gray-700">Nando's Art</a>
+    {{-- Barra del estudio: solo la ve el artista, con los atajos del panel --}}
+    @if (Auth::user()?->isAdmin())
+        <div class="bg-noche text-papel/80 text-xs">
+            <div class="contenedor flex flex-wrap items-center gap-x-5 gap-y-1 py-2">
+                <span class="font-semibold tracking-[0.2em] uppercase text-acento-claro">Estudio</span>
+                @foreach ($panel as [$ruta, $texto, $activas])
+                    <a href="{{ route($ruta) }}" @if (request()->routeIs(...$activas)) aria-current="page" class="text-white" @else class="hover:text-white" @endif>{{ $texto }}</a>
+                @endforeach
+                <a href="{{ route('products.create') }}" class="ml-auto hover:text-white">+ Nueva obra</a>
+            </div>
+        </div>
+    @endif
+
+    <header class="sticky top-0 z-40 border-b border-linea/80 bg-papel/85 backdrop-blur-md supports-[backdrop-filter]:bg-papel/70">
+        <nav class="contenedor flex flex-wrap items-center justify-between gap-y-3 py-4" aria-label="Principal">
+            <a href="{{ route('landing') }}" class="group flex items-baseline gap-2" aria-label="Nando's Art, inicio">
+                <span class="font-display text-2xl font-semibold italic tracking-tight">Nando's Art</span>
+                <span class="hidden sm:inline text-[11px] font-semibold tracking-[0.25em] uppercase text-tinta-tenue group-hover:text-acento transition">Fernando Delgado</span>
+            </a>
 
             {{-- En móvil el menú se pliega; lo abre resources/js/menu.js --}}
-            <button type="button" class="md:hidden p-2 rounded-sm text-gray-700 hover:bg-white/50"
+            <button type="button" class="md:hidden -mr-2 p-2 rounded-full text-tinta hover:bg-papel-oscuro"
                     data-menu-boton aria-controls="menu-principal" aria-expanded="false" aria-label="Abrir menú">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h10"/>
                 </svg>
             </button>
 
             <ul id="menu-principal"
-                class="hidden w-full md:w-auto md:flex flex-col md:flex-row gap-3 md:gap-6 md:items-center pt-4 md:pt-0">
-                <li>
-                    <a href="{{ route('landing') }}" class="text-gray-700 hover:text-blue-500 font-medium">Inicio</a>
-                </li>
-                <li>
-                    <a href="{{ route('galeria') }}" class="text-blue-500 font-semibold hover:underline">Galería</a>
-                </li>
-                <li>
-                    <a href="{{ route('paginas.sobre-mi') }}" class="text-gray-700 hover:text-blue-500 font-medium">Sobre mí</a>
-                </li>
-                <li>
-                    <a href="{{ route('paginas.contacto') }}" class="text-gray-700 hover:text-blue-500 font-medium">Contacto</a>
-                </li>
+                class="hidden w-full md:w-auto md:flex flex-col md:flex-row gap-4 md:gap-8 md:items-center border-t border-linea md:border-0 pt-4 md:pt-0">
+                @foreach ($menu as [$ruta, $texto, $activas])
+                    <li>
+                        <a href="{{ route($ruta) }}" class="nav-enlace" @if (request()->routeIs(...$activas)) aria-current="page" @endif>{{ $texto }}</a>
+                    </li>
+                @endforeach
                 @guest
                     <li>
-                        <a href="{{ route('login') }}" class="text-blue-500 font-semibold hover:underline">Iniciar Sesión</a>
+                        <a href="{{ route('login') }}" class="nav-enlace" @if (request()->routeIs('login')) aria-current="page" @endif>Iniciar sesión</a>
                     </li>
                     <li>
-                        <a href="{{ route('register') }}" class="inline-block bg-pink-200 text-gray-700 px-3 py-1 rounded-sm hover:bg-pink-300 font-medium transition">Crear cuenta</a>
+                        <a href="{{ route('encargos.create') }}" class="btn btn-primario btn-pequeno">Pedir un encargo</a>
                     </li>
                 @endguest
                 @auth
                     <li>
-                        <a href="{{ route('dashboard') }}" class="text-blue-500 font-semibold hover:underline">Mis presupuestos</a>
+                        <a href="{{ route('dashboard') }}" class="nav-enlace" @if (request()->routeIs('dashboard', 'encargos.show', 'encargos.create')) aria-current="page" @endif>Mis presupuestos</a>
                     </li>
-                    @if(Auth::user()->isAdmin())
-                        <li>
-                            <a href="{{ route('admin') }}" class="text-blue-500 font-semibold hover:underline">Panel</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.obras.index') }}" class="text-blue-500 font-semibold hover:underline">Obras</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.paginas.index') }}" class="text-blue-500 font-semibold hover:underline">Páginas</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('encargos.index') }}" class="text-blue-500 font-semibold hover:underline">
-                                Presupuestos recibidos
-                            </a>
-                        </li>
-                    @endif
                     <li>
-                        <a href="{{ route('profile') }}" class="text-blue-500 font-semibold hover:underline">Mi perfil</a>
+                        <a href="{{ route('profile') }}" class="nav-enlace" @if (request()->routeIs('profile')) aria-current="page" @endif>Mi perfil</a>
                     </li>
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="text-red-500 font-semibold hover:underline bg-transparent border-none cursor-pointer p-0">Cerrar sesión</button>
+                            <button type="submit" class="nav-enlace">Cerrar sesión</button>
                         </form>
                     </li>
                 @endauth
             </ul>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
     {{-- Mensajes de éxito de cualquier acción (redirect()->with('success', ...)) --}}
     @if (session('success'))
-        <div class="max-w-5xl mx-auto mt-4 px-4">
-            <p role="status" class="bg-green-100 text-green-800 p-3 rounded-sm">{{ session('success') }}</p>
+        <div class="contenedor mt-6">
+            <p role="status" class="aviso aviso-ok">{{ session('success') }}</p>
         </div>
     @endif
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main>
+    <main id="contenido" class="flex-1" tabindex="-1">
         @yield('content')
     </main>
+
+    <x-footer />
     @yield('scripts')
 </body>
 </html>

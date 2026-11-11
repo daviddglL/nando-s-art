@@ -1,23 +1,254 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/inter';
 
 /* Clases que se generan desde PHP (colores de cada estilo en App\Enums) */
 @source '../../app/Enums';
 
 /*
-  Compatibilidad con Tailwind 3, que es con el que se diseñó la web:
-  en Tailwind 4 los bordes usan currentColor y los botones no llevan cursor de mano.
+  Sistema de diseño «Estudio»: papel de acuarela cálido, tinta casi negra y un acento terracota.
+  La tipografía de los títulos es Fraunces (serif con carácter, de cartel de exposición)
+  y la del texto, Inter. Las dos van dentro del CSS compilado: no se piden a Google (CSP).
 */
+@theme {
+    --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+
+    --color-papel: #f7f2ea;
+    --color-papel-claro: #fcfaf6;
+    --color-papel-oscuro: #ece3d4;
+    --color-linea: #e0d5c3;
+    --color-tinta: #1e1a16;
+    --color-tinta-suave: #5c544a;
+    --color-tinta-tenue: #8a8072;
+    --color-acento: #b0502c;
+    --color-acento-oscuro: #8c3d1f;
+    --color-acento-claro: #f3dccf;
+    --color-salvia: #5f7a64;
+    --color-noche: #191613;
+
+    --shadow-cuadro: 0 1px 2px rgb(30 26 22 / 0.06), 0 12px 32px -12px rgb(30 26 22 / 0.28);
+    --shadow-flotante: 0 2px 4px rgb(30 26 22 / 0.06), 0 24px 60px -20px rgb(30 26 22 / 0.45);
+
+    --animate-aparecer: aparecer 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+    @keyframes aparecer {
+        from {
+            opacity: 0;
+            transform: translateY(14px);
+        }
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
 @layer base {
+    /* En Tailwind 4 los bordes usan currentColor: aquí, la línea fina del papel */
     *,
     ::after,
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-linea, currentColor);
     }
 
     button:not(:disabled),
     [role='button']:not(:disabled) {
         cursor: pointer;
+    }
+
+    html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        background-color: var(--color-papel);
+        color: var(--color-tinta);
+        font-family: var(--font-sans);
+        font-feature-settings: 'cv11', 'ss01';
+        -webkit-font-smoothing: antialiased;
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-family: var(--font-display);
+        font-optical-sizing: auto;
+        letter-spacing: -0.015em;
+        text-wrap: balance;
+    }
+
+    ::selection {
+        background: var(--color-acento-claro);
+        color: var(--color-tinta);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-acento);
+        outline-offset: 3px;
+        border-radius: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+
+        *,
+        ::before,
+        ::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
+
+@layer components {
+    .contenedor {
+        @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+    }
+
+    /* Rótulo pequeño en versalitas encima de los títulos, como en las cartelas de un museo */
+    .antetitulo {
+        @apply text-xs font-semibold tracking-[0.2em] text-acento uppercase;
+    }
+
+    .titulo-pagina {
+        @apply font-display text-4xl leading-[1.05] font-medium text-tinta sm:text-5xl md:text-6xl;
+    }
+
+    .titulo-seccion {
+        @apply font-display text-3xl leading-tight font-medium text-tinta md:text-4xl;
+    }
+
+    .texto-largo {
+        @apply text-lg leading-relaxed text-tinta-suave;
+    }
+
+    .enlace {
+        @apply font-medium text-acento underline decoration-acento/30 underline-offset-4 transition hover:decoration-acento;
+    }
+
+    /* Botones */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn-primario {
+        @apply bg-tinta text-papel-claro hover:bg-acento;
+    }
+
+    .btn-acento {
+        @apply bg-acento text-white hover:bg-acento-oscuro;
+    }
+
+    .btn-secundario {
+        @apply border border-tinta/20 bg-transparent text-tinta hover:border-tinta hover:bg-tinta hover:text-papel-claro;
+    }
+
+    .btn-peligro {
+        @apply border border-red-800/20 bg-transparent text-red-800 hover:bg-red-800 hover:text-white;
+    }
+
+    .btn-pequeno {
+        @apply px-4 py-1.5 text-xs;
+    }
+
+    /* Formularios */
+    .etiqueta {
+        @apply mb-1.5 block text-sm font-semibold text-tinta;
+    }
+
+    .campo {
+        @apply block w-full rounded-lg border border-linea bg-papel-claro px-4 py-2.5 text-tinta shadow-xs transition placeholder:text-tinta-tenue focus:border-acento focus:ring-2 focus:ring-acento/20 focus:outline-none;
+    }
+
+    .campo-fichero {
+        @apply block w-full text-sm text-tinta-suave file:mr-4 file:rounded-full file:border-0 file:bg-tinta file:px-4 file:py-2 file:text-sm file:font-semibold file:text-papel-claro hover:file:bg-acento;
+    }
+
+    .error-campo {
+        @apply mt-1.5 text-sm text-red-700;
+    }
+
+    .ayuda {
+        @apply mt-1.5 text-sm text-tinta-tenue;
+    }
+
+    /* Superficies */
+    .lamina {
+        @apply rounded-2xl border border-linea bg-papel-claro p-6 shadow-cuadro sm:p-10;
+    }
+
+    .marco {
+        @apply bg-white p-2 shadow-cuadro sm:p-3;
+    }
+
+    .chip {
+        @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-wide;
+    }
+
+    .chip-disponible {
+        @apply bg-salvia/12 text-salvia;
+    }
+
+    .chip-vendida {
+        @apply bg-tinta/8 text-tinta-suave;
+    }
+
+    .aviso {
+        @apply rounded-xl border px-4 py-3 text-sm;
+    }
+
+    .aviso-ok {
+        @apply border-salvia/30 bg-salvia/10 text-[#3e5443];
+    }
+
+    .aviso-error {
+        @apply border-red-700/20 bg-red-50 text-red-800;
+    }
+
+    /* Tablas del panel */
+    .tabla {
+        @apply min-w-full text-left text-sm;
+    }
+
+    .tabla thead tr {
+        @apply border-b border-linea text-xs tracking-wider text-tinta-tenue uppercase;
+    }
+
+    .tabla th {
+        @apply px-4 py-3 font-semibold;
+    }
+
+    .tabla td {
+        @apply px-4 py-3 align-middle;
+    }
+
+    .tabla tbody tr {
+        @apply border-b border-linea/70 last:border-0 hover:bg-papel/60;
+    }
+
+    /* Navegación */
+    .nav-enlace {
+        @apply relative py-1 text-sm font-medium text-tinta-suave transition hover:text-tinta;
+    }
+
+    .nav-enlace[aria-current='page'] {
+        @apply text-tinta;
+    }
+
+    .nav-enlace[aria-current='page']::after {
+        content: '';
+        @apply absolute inset-x-0 -bottom-0.5 h-px bg-acento;
+    }
+
+    /* Textura de grano muy suave, como papel de acuarela */
+    .grano {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 }
