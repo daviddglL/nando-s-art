@@ -3,7 +3,6 @@
 use App\Models\Encargo;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 // --- Imágenes de referencia de los presupuestos: privadas ---
@@ -82,51 +81,11 @@ test('la migración mueve las imágenes antiguas del disco público al privado',
     expect(Storage::disk('local')->get('presupuestos/vieja.jpg'))->toBe('contenido');
 });
 
-// --- API de usuarios: cambiar contraseña o email exige la contraseña actual ---
+// --- API de usuarios: se quitó porque ninguna pantalla la usaba (el perfil ya pide la contraseña actual) ---
 
-test('la API no cambia la contraseña de la propia cuenta sin la contraseña actual', function () {
-    $user = User::factory()->create(['password' => Hash::make('actual-123')]);
-
-    $this->actingAs($user)
-        ->putJson("/api/users/{$user->id}", ['password' => 'nueva-12345'])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('current_password');
-
-    $this->actingAs($user)
-        ->putJson("/api/users/{$user->id}", ['password' => 'nueva-12345', 'current_password' => 'mal'])
-        ->assertJsonValidationErrors('current_password');
-
-    expect(Hash::check('actual-123', $user->fresh()->password))->toBeTrue();
-
-    $this->actingAs($user)
-        ->putJson("/api/users/{$user->id}", ['password' => 'nueva-12345', 'current_password' => 'actual-123'])
-        ->assertOk();
-
-    expect(Hash::check('nueva-12345', $user->fresh()->password))->toBeTrue();
-});
-
-test('la API no cambia el email de la propia cuenta sin la contraseña actual', function () {
-    $user = User::factory()->create(['password' => Hash::make('actual-123'), 'email' => 'antes@example.com']);
-
-    $this->actingAs($user)
-        ->putJson("/api/users/{$user->id}", ['email' => 'ladron@example.com'])
-        ->assertJsonValidationErrors('current_password');
-    expect($user->fresh()->email)->toBe('antes@example.com');
-
-    $this->actingAs($user)
-        ->putJson("/api/users/{$user->id}", ['email' => 'despues@example.com', 'current_password' => 'actual-123'])
-        ->assertOk();
-    expect($user->fresh())
-        ->email->toBe('despues@example.com')
-        ->email_verified_at->toBeNull();
-});
-
-test('el admin puede cambiar la contraseña de otro usuario sin conocer la suya', function () {
+test('la API de usuarios ya no existe', function () {
     $user = User::factory()->create();
 
-    $this->actingAs(admin())
-        ->putJson("/api/users/{$user->id}", ['password' => 'restablecida-1'])
-        ->assertOk();
-
-    expect(Hash::check('restablecida-1', $user->fresh()->password))->toBeTrue();
+    $this->actingAs(admin())->getJson('/api/users')->assertNotFound();
+    $this->actingAs($user)->putJson("/api/users/{$user->id}", ['password' => 'nueva-12345'])->assertNotFound();
 });

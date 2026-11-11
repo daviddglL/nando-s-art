@@ -31,16 +31,6 @@ test('la ruta /api/upload-image ya no existe', function () {
     $this->actingAs(admin())->postJson('/api/upload-image')->assertNotFound();
 });
 
-test('la API de usuarios devuelve la lista paginada y sin contraseñas', function () {
-    User::factory()->count(25)->create();
-
-    $this->actingAs(admin())->getJson('/api/users')
-        ->assertOk()
-        ->assertJsonCount(20, 'data')
-        ->assertJsonPath('total', 26)
-        ->assertJsonMissingPath('data.0.password');
-});
-
 // --- Papelera de obras ---
 
 test('el admin elimina definitivamente una obra de la papelera junto con su imagen', function () use ($obraConImagen) {

@@ -10,6 +10,7 @@ use App\Notifications\MensajeContacto;
 use App\Notifications\NuevoPresupuesto;
 use App\Support\Imagen;
 use App\Support\Markdown;
+use Database\Seeders\ProductSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
@@ -192,4 +193,14 @@ test('buscar % o _ no devuelve todas las obras', function () {
 
     $this->getJson('/api/products?q=%25')->assertJsonCount(1, 'data')->assertJsonPath('data.0.name', 'Al 100% azul');
     $this->getJson('/api/products?q=_')->assertJsonCount(0, 'data');
+});
+
+test('el seeder copia siempre las fotos de database/seeders/imagenes a la carpeta obras', function () {
+    // Una imagen vieja con el mismo nombre ya no impide que llegue la nueva
+    Storage::disk('public')->put('obras/caseta.webp', 'imagen vieja');
+
+    $this->seed(ProductSeeder::class);
+
+    expect(Storage::disk('public')->get('obras/caseta.webp'))
+        ->toBe(file_get_contents(ProductSeeder::CARPETA_IMAGENES.'/caseta.webp'));
 });
