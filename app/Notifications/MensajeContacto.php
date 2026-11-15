@@ -3,16 +3,13 @@
 namespace App\Notifications;
 
 use App\Support\Markdown;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 // Aviso al artista: alguien le ha escrito desde el formulario de /contacto
-class MensajeContacto extends Notification implements ShouldQueue
+// Se envía en el momento (sin colas ni base de datos)
+class MensajeContacto extends Notification
 {
-    use Queueable;
-
     public function __construct(public string $nombre, public string $email, public string $mensaje) {}
 
     /**

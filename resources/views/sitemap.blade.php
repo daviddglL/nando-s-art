@@ -7,7 +7,9 @@
 @foreach ($obras as $obra)
     <url>
         <loc>{{ route('obras.show', $obra->slug) }}</loc>
-        <lastmod>{{ $obra->updated_at?->toAtomString() }}</lastmod>
+@if ($obra->modificada())
+        <lastmod>{{ date(DATE_ATOM, $obra->modificada()) }}</lastmod>
+@endif
     </url>
 @endforeach
 </urlset>

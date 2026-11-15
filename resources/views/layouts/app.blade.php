@@ -32,28 +32,9 @@
         ['paginas.sobre-mi', 'Sobre mí', ['paginas.sobre-mi']],
         ['paginas.contacto', 'Contacto', ['paginas.contacto']],
     ];
-    $panel = [
-        ['admin', 'Resumen', ['admin']],
-        ['admin.obras.index', 'Obras', ['admin.obras.*', 'products.create']],
-        ['encargos.index', 'Presupuestos', ['encargos.index']],
-        ['admin.paginas.index', 'Páginas', ['admin.paginas.*']],
-    ];
 @endphp
 <body class="min-h-screen flex flex-col bg-papel text-tinta">
     <a href="#contenido" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 btn btn-primario">Saltar al contenido</a>
-
-    {{-- Barra del estudio: solo la ve el artista, con los atajos del panel --}}
-    @if (Auth::user()?->isAdmin())
-        <div class="bg-noche text-papel/80 text-xs">
-            <div class="contenedor flex flex-wrap items-center gap-x-5 gap-y-1 py-2">
-                <span class="font-semibold tracking-[0.2em] uppercase text-acento-claro">Estudio</span>
-                @foreach ($panel as [$ruta, $texto, $activas])
-                    <a href="{{ route($ruta) }}" @if (request()->routeIs(...$activas)) aria-current="page" class="text-white" @else class="hover:text-white" @endif>{{ $texto }}</a>
-                @endforeach
-                <a href="{{ route('products.create') }}" class="ml-auto hover:text-white">+ Nueva obra</a>
-            </div>
-        </div>
-    @endif
 
     <header class="sticky top-0 z-40 border-b border-linea/80 bg-papel/85 backdrop-blur-md supports-[backdrop-filter]:bg-papel/70">
         <nav class="contenedor flex flex-wrap items-center justify-between gap-y-3 py-4" aria-label="Principal">
@@ -77,36 +58,22 @@
                         <a href="{{ route($ruta) }}" class="nav-enlace" @if (request()->routeIs(...$activas)) aria-current="page" @endif>{{ $texto }}</a>
                     </li>
                 @endforeach
-                @guest
-                    <li>
-                        <a href="{{ route('login') }}" class="nav-enlace" @if (request()->routeIs('login')) aria-current="page" @endif>Iniciar sesión</a>
-                    </li>
-                    <li>
-                        <a href="{{ route('encargos.create') }}" class="btn btn-primario btn-pequeno">Pedir un encargo</a>
-                    </li>
-                @endguest
-                @auth
-                    <li>
-                        <a href="{{ route('dashboard') }}" class="nav-enlace" @if (request()->routeIs('dashboard', 'encargos.show', 'encargos.create')) aria-current="page" @endif>Mis presupuestos</a>
-                    </li>
-                    <li>
-                        <a href="{{ route('profile') }}" class="nav-enlace" @if (request()->routeIs('profile')) aria-current="page" @endif>Mi perfil</a>
-                    </li>
-                    <li>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="nav-enlace">Cerrar sesión</button>
-                        </form>
-                    </li>
-                @endauth
+                <li>
+                    <a href="{{ route('paginas.contacto') }}" class="btn btn-primario btn-pequeno">Pedir un encargo</a>
+                </li>
             </ul>
         </nav>
     </header>
 
-    {{-- Mensajes de éxito de cualquier acción (redirect()->with('success', ...)) --}}
+    {{-- Mensajes de éxito o error (redirect()->with('success'|'error', ...)) --}}
     @if (session('success'))
         <div class="contenedor mt-6">
             <p role="status" class="aviso aviso-ok">{{ session('success') }}</p>
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="contenedor mt-6">
+            <p role="alert" class="aviso aviso-error">{{ session('error') }}</p>
         </div>
     @endif
 

@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-// Técnica de una obra. Es la única lista de estilos: migración, validación, vistas y seeders salen de aquí.
+// Técnica de una obra. Es la única lista de estilos: el fichero de obras, los filtros y la API salen de aquí.
 enum Style: string
 {
     use HasValues;
@@ -49,19 +49,6 @@ enum Style: string
             self::Sketch => 'bg-[#3a3732] text-white hover:bg-[#25231f]',
             self::Papel => 'bg-[#44603d] text-white hover:bg-[#354c30]',
             self::Lienzo => 'bg-[#5a3e6a] text-white hover:bg-[#473153]',
-        };
-    }
-
-    // Color del texto en la tabla de presupuestos del admin
-    public function textColor(): string
-    {
-        return match ($this) {
-            self::Acuarela => 'text-sky-600',
-            self::Rotulador => 'text-yellow-600',
-            self::Oleo => 'text-pink-600',
-            self::Sketch => 'text-gray-600',
-            self::Papel => 'text-emerald-600',
-            self::Lienzo => 'text-purple-600',
         };
     }
 }

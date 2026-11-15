@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { iniciarConfirmaciones } from '../../resources/js/confirmar.js';
 import { iniciarLightbox } from '../../resources/js/lightbox.js';
 import { iniciarMenu } from '../../resources/js/menu.js';
 
@@ -115,39 +114,5 @@ describe('lightbox con varias imágenes', () => {
         toque('touchstart', 300);
         toque('touchend', 100);
         expect(visibles()).toEqual(['2']);
-    });
-});
-
-describe('confirmación de formularios (sin JS en línea, por la CSP)', () => {
-    beforeEach(() => {
-        document.body.innerHTML = `
-            <form data-confirmar="¿Seguro?"><button>Borrar</button></form>
-            <form id="normal"><button>Guardar</button></form>`;
-    });
-
-    const enviar = (form) => {
-        const evento = new Event('submit', { bubbles: true, cancelable: true });
-        form.dispatchEvent(evento);
-        return evento;
-    };
-
-    it('cancela el envío si el usuario no confirma y lo deja pasar si confirma', () => {
-        iniciarConfirmaciones(document.body);
-        const form = document.querySelector('[data-confirmar]');
-
-        window.confirm = vi.fn(() => false);
-        expect(enviar(form).defaultPrevented).toBe(true);
-        expect(window.confirm).toHaveBeenCalledWith('¿Seguro?');
-
-        window.confirm = vi.fn(() => true);
-        expect(enviar(form).defaultPrevented).toBe(false);
-    });
-
-    it('no pregunta en los formularios sin data-confirmar', () => {
-        iniciarConfirmaciones(document.body);
-        window.confirm = vi.fn(() => false);
-
-        expect(enviar(document.getElementById('normal')).defaultPrevented).toBe(false);
-        expect(window.confirm).not.toHaveBeenCalled();
     });
 });

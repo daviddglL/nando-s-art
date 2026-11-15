@@ -22,7 +22,7 @@
                     @endif
                     @if ($pagina->instagram)
                         <dt class="pt-4 sm:py-4 sm:border-b border-linea text-sm text-tinta-tenue">Instagram</dt>
-                        <dd class="pb-4 sm:py-4 border-b border-linea"><a href="{{ $pagina->instagram }}" target="_blank" rel="noopener noreferrer" class="enlace break-all">{{ '@'.trim(Str::after($pagina->instagram, 'instagram.com/'), '/') }}</a></dd>
+                        <dd class="pb-4 sm:py-4 border-b border-linea"><a href="{{ $pagina->instagram }}" target="_blank" rel="noopener noreferrer" class="enlace break-all">{{ $pagina->usuarioInstagram() }}</a></dd>
                     @endif
                     @if ($pagina->ubicacion)
                         <dt class="pt-4 sm:py-4 sm:border-b border-linea text-sm text-tinta-tenue">Dónde estoy</dt>
@@ -33,17 +33,16 @@
 
             <div class="mt-10 rounded-2xl bg-noche text-papel/80 p-7 grano">
                 <h2 class="font-display text-2xl text-papel">¿Tienes una idea para un encargo?</h2>
-                <p class="mt-2 text-sm">Cuéntamela con medidas, estilo y una imagen de referencia, y te respondo con un presupuesto.</p>
-                <a href="{{ route('encargos.create') }}" class="btn btn-acento mt-5">Pedir presupuesto</a>
+                <p class="mt-2 text-sm">Cuéntamela en el formulario: medidas, técnica y qué te imaginas. Te respondo por email con un presupuesto y, si tienes una foto de referencia, te diré cómo mandármela.</p>
             </div>
         </div>
 
-        {{-- Para escribir sin crear una cuenta (MensajeContactoController) --}}
+        {{-- El mensaje llega por email al artista (MensajeContactoController); no se guarda nada --}}
         <form id="formulario-contacto" method="POST" action="{{ route('contacto.enviar') }}" class="lamina space-y-5 scroll-mt-28">
             @csrf
             <div>
                 <h2 class="font-display text-3xl">Escríbeme</h2>
-                <p class="mt-1 text-sm text-tinta-tenue">No hace falta crear una cuenta. Te contesto al email que pongas.</p>
+                <p class="mt-1 text-sm text-tinta-tenue">Te contesto al email que pongas.</p>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
@@ -59,7 +58,7 @@
             </div>
             <div>
                 <label for="contacto-mensaje" class="etiqueta">Mensaje</label>
-                <textarea id="contacto-mensaje" name="mensaje" rows="7" required minlength="10" maxlength="5000" class="campo">{{ old('mensaje') }}</textarea>
+                <textarea id="contacto-mensaje" name="mensaje" rows="7" required minlength="10" maxlength="5000" class="campo">{{ old('mensaje', $mensajeInicial) }}</textarea>
                 @error('mensaje') <p class="error-campo">{{ $message }}</p> @enderror
             </div>
             {{-- Campo trampa: oculto para las personas, los bots lo rellenan --}}
