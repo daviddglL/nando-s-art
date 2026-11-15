@@ -34,7 +34,7 @@
         <div>
             <p class="antetitulo">El artista</p>
             <h1 class="titulo-pagina mt-3">{{ $pagina->titulo }}</h1>
-            {{-- Texto plano: los saltos de línea del panel se respetan y no se interpreta HTML --}}
+            {{-- Texto plano: los saltos de línea se respetan y no se interpreta HTML --}}
             <div class="mt-10 texto-largo whitespace-pre-line first-letter:float-left first-letter:font-display first-letter:text-7xl first-letter:leading-[0.8] first-letter:mr-3 first-letter:mt-1 first-letter:text-acento">{{ $pagina->contenido }}</div>
 
             <div class="mt-12 flex flex-wrap gap-3">

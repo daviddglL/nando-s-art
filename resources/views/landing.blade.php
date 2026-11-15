@@ -31,7 +31,7 @@
             <p class="mt-7 max-w-md texto-largo">Obras originales en acuarela, óleo y rotulador: retratos, paisajes y encargos hechos a mano.</p>
             <div class="mt-9 flex flex-wrap gap-3">
                 <a href="{{ route('galeria') }}" class="btn btn-primario">Ver la galería <span aria-hidden="true">→</span></a>
-                <a href="{{ route('encargos.create') }}" class="btn btn-secundario">Pedir un encargo</a>
+                <a href="{{ route('paginas.contacto') }}" class="btn btn-secundario">Pedir un encargo</a>
             </div>
         </div>
 
@@ -61,7 +61,7 @@
     </div>
 </section>
 
-{{-- Obras destacadas: las marca el admin en /admin/obras --}}
+{{-- Obras destacadas: las que tienen 'destacada' => true en resources/contenido/obras.php --}}
 @if ($destacadas->isNotEmpty())
     <section class="contenedor py-20" aria-labelledby="titulo-destacadas">
         <div class="flex flex-wrap items-end justify-between gap-6 mb-10">
@@ -89,7 +89,7 @@
     </section>
 @endif
 
-{{-- El artista: foto y comienzo del texto de «Sobre mí», que edita en el panel --}}
+{{-- El artista: foto y comienzo del texto de «Sobre mí» (resources/contenido/paginas.php) --}}
 <section class="bg-papel-oscuro/60 border-y border-linea">
     <div class="contenedor py-20 grid md:grid-cols-[minmax(0,20rem)_1fr] gap-12 items-center">
         <img src="{{ $sobreMi->fotoUrl() ?? asset('images/nandofoto-352.webp') }}" alt="Fernando Delgado, el artista"
@@ -117,11 +117,12 @@
             <p class="antetitulo">Por encargo</p>
             <h2 id="titulo-encargos" class="titulo-seccion mt-3">Una obra pensada para ti</h2>
             <p class="mt-4 text-tinta-suave">Un retrato, tu mascota, el paisaje de tu pueblo… Cuéntame la idea y te digo cuánto costaría, sin compromiso.</p>
+            <a href="{{ route('paginas.contacto') }}" class="btn btn-primario mt-6">Escribirme</a>
         </div>
         <ol class="grid sm:grid-cols-3 gap-6">
             @foreach ([
-                ['Cuéntame la idea', 'Medidas, técnica y, si quieres, una foto de referencia.'],
-                ['Recibe el presupuesto', 'Te respondo con el precio y los detalles en tu cuenta y por email.'],
+                ['Cuéntame la idea', 'Escríbeme desde la página de contacto con las medidas y la técnica que te imaginas.'],
+                ['Recibe el presupuesto', 'Te respondo por email con el precio y los detalles.'],
                 ['Manos a la obra', 'Si te encaja, me pongo a pintar tu cuadro.'],
             ] as [$paso, $texto])
                 <li class="border-t border-tinta/15 pt-4">

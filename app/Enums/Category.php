@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-// Tema de una obra o de un encargo
+// Tema de una obra
 enum Category: string
 {
     use HasValues;
@@ -21,18 +21,6 @@ enum Category: string
             self::Abstracto => 'Abstracto',
             self::Urbano => 'Urbano',
             self::Otro => 'Otro',
-        };
-    }
-
-    // Color del texto en la tabla de presupuestos del admin
-    public function textColor(): string
-    {
-        return match ($this) {
-            self::Retrato => 'text-pink-600',
-            self::Paisaje => 'text-green-600',
-            self::Abstracto => 'text-indigo-600',
-            self::Urbano => 'text-blue-600',
-            self::Otro => 'text-gray-600',
         };
     }
 }

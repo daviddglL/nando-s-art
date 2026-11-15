@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CabecerasSeguridad;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,10 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias([
-            'admin' => AdminMiddleware::class,
-        ]);
-
         // CSP, X-Frame-Options, Referrer-Policy, HSTS… en todas las respuestas
         $middleware->append(CabecerasSeguridad::class);
 

@@ -1,59 +1,63 @@
 # Nando's Art
 
-Galería de arte de Fernando Delgado: muestra las obras por estilo y permite a los clientes pedir presupuestos.
+Galería de arte de Fernando Delgado: muestra las obras por técnica y tema, cada una con su ficha, y tiene un formulario de contacto que manda un email al artista.
 
-Hecha con Laravel 13, Tailwind CSS 4 y Vite. El login es el de `laravel/ui` (rutas de `Auth::routes()`).
+Hecha con Laravel 13, Tailwind CSS 4 y Vite. **No usa base de datos ni cuentas de usuario**: las obras y los textos están en ficheros del repo.
 
 ## Instalación
 
-Requisitos: PHP 8.4.1+ con la extensión GD (con soporte WebP, para las miniaturas), Composer, Node 22.12+ y MySQL (o SQLite para pruebas).
+Requisitos: PHP 8.4.1+, Composer y Node 22.12+. La extensión GD con WebP solo hace falta para generar miniaturas.
 
 ```bash
 composer install
 npm ci
 cp .env.example .env
 php artisan key:generate
-# Rellena DB_* y ADMIN_PASSWORD en .env
-php artisan migrate --seed
-php artisan storage:link
-npm run build      # o `npm run dev` mientras desarrollas
+npm run build      # o `composer run dev` mientras desarrollas
 ```
 
-Los estilos ya no vienen de un CDN: si no se ejecuta `npm run build` (o `npm run dev`), las páginas fallan porque no encuentran `public/build/manifest.json`.
+Los estilos no vienen de un CDN: si no se ejecuta `npm run build` (o `npm run dev`), las páginas fallan porque no encuentran `public/build/manifest.json`.
 
-`migrate --seed` crea el admin (con los datos de `ADMIN_*` en `.env`) y, salvo en producción, 6 obras y 5 presupuestos de ejemplo. Las imágenes de esas obras están en `database/seeders/imagenes/` y el seeder las copia a `storage/app/public/obras`. Son imágenes de relleno: si sustituyes esos ficheros por las fotos reales (con el mismo nombre), una instalación nueva ya sale con ellas.
+## Cambiar las obras y los textos
 
-### Imágenes y miniaturas
+Todo está en `resources/contenido/`:
 
-Al subir o cambiar la imagen de una obra se generan versiones WebP de 400, 800 y 1600 px de ancho en `storage/app/public/obras/miniaturas/` (nunca más anchas que la original). La galería, la ficha y el admin las usan con `srcset`, así que el móvil descarga la pequeña; el lightbox sigue abriendo la original.
+- **`obras.php`**: la lista de obras (título, descripción, técnica, tema, medidas, año, precio, vendida, destacada y fotos). Salen en la galería en el mismo orden. Las destacadas (como mucho 6) salen en la portada. Al principio del fichero se explica cada campo.
+- **`paginas.php`**: los textos de «Sobre mí» y «Contacto» (email, teléfono, Instagram y ubicación). El primer párrafo de «Sobre mí» sale también en la portada.
 
-Cada obra tiene una imagen principal (la de la galería) y hasta 12 adicionales (detalles, otros ángulos...), que se suben, ordenan, borran o se convierten en la principal en la sección "Más imágenes" de su pantalla de edición. Salen en la ficha como miniaturas y en el visor, que pasa de una a otra con flechas, teclado o deslizando el dedo. Tienen sus propias miniaturas WebP y se borran con la obra al eliminarla definitivamente.
+Las fotos de las obras van en `public/obras/` y la foto de «Sobre mí» en `public/images/`.
 
-Para las obras que ya existían (o si se borra esa carpeta):
+Después de tocar estos ficheros, `php artisan test` comprueba que todo está bien escrito (que las técnicas existen, que las fotos están, que no hay dos obras con el mismo slug…).
+
+### Miniaturas
 
 ```bash
 php artisan obras:miniaturas
 ```
 
-Si el servidor no tiene GD con WebP, las obras se ven igual con la imagen original.
+Crea versiones WebP de 400, 800 y 1600 px de cada foto en `public/obras/miniaturas/`, para que el móvil descargue la pequeña. Es opcional: sin miniaturas se usa la foto tal cual.
 
-### Cuentas de cliente
+## Formulario de contacto
 
-Al registrarse se envía un email de verificación, y hasta abrir el enlace no se pueden pedir presupuestos ni ver "Mis presupuestos". El registro admite como mucho 5 cuentas por hora desde la misma IP y tiene un campo oculto que solo rellenan los bots. Las cuentas que ya existían se dieron por verificadas al migrar.
+Cada mensaje llega por email a `CONTACTO_EMAIL` (o, si está vacío, al email de `paginas.php`), con «Responder» apuntando a quien escribió. No se guarda nada. Se envía en el momento, sin colas: si el correo falla, la persona ve un aviso y no pierde lo que escribió.
 
-### Emails
+Para que se envíe de verdad hay que poner los datos SMTP en `.env`. Con `MAIL_MAILER=log` (lo que viene por defecto) los mensajes solo se escriben en `storage/logs/laravel.log`, que viene bien para probar en local.
 
-Al llegar un presupuesto se avisa por email a los usuarios admin, y al responderlo se avisa al cliente. Los emails van a una cola (`QUEUE_CONNECTION=database`), así que en el servidor tiene que estar corriendo un worker:
-
-```bash
-php artisan queue:work --tries=3
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.tu-proveedor.com
+MAIL_PORT=587
+MAIL_USERNAME=…
+MAIL_PASSWORD=…
+MAIL_FROM_ADDRESS="web@tu-dominio.com"
+CONTACTO_EMAIL=info@fernandodelgadoart.com
 ```
 
-Configura también `MAIL_*` en `.env` (por defecto `MAIL_MAILER=log` solo los escribe en `storage/logs`).
+Hay un límite de 3 mensajes por minuto y 10 por hora desde la misma IP, y un campo oculto que solo rellenan los bots.
 
 ## Despliegue en producción
 
-En el `.env` del servidor: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `DB_*`, `MAIL_*`, `ADMIN_*` y `QUEUE_CONNECTION=database`.
+En el `.env` del servidor: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `MAIL_*` y `CONTACTO_EMAIL`. La sesión (que solo usa el formulario) y la caché van en ficheros de `storage/`, así que esa carpeta tiene que poder escribirse.
 
 En cada despliegue, `./deploy.sh` desde la carpeta del proyecto. Hace estos pasos y, si alguno falla, se para y vuelve a poner la web en marcha:
 
@@ -62,9 +66,8 @@ php artisan down
 git pull
 composer install --no-dev --optimize-autoloader
 npm ci && npm run build
-php artisan migrate --force
-php artisan storage:link           # solo la primera vez
 php artisan optimize               # cachea config, rutas, vistas y eventos
-php artisan queue:restart          # el worker recoge el código nuevo
 php artisan up
 ```
+
+Ya no hace falta `migrate`, ni el worker de colas, ni el cron de Laravel.

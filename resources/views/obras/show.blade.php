@@ -5,7 +5,7 @@
 @section('og_image', $obra->imagenGrandeUrl())
 
 @php
-    // La principal primero y después las adicionales, en el orden que fija el admin
+    // La principal primero y después las adicionales, en el orden de resources/contenido/obras.php
     $imagenes = collect([$obra])->concat($obra->imagenes);
 
     // Datos estructurados: Google puede enseñar la obra con su imagen y, si está a la venta, su precio
@@ -96,12 +96,11 @@
                 <dd class="py-3 border-b border-linea font-display text-xl">{{ $obra->precioTexto() }}</dd>
             </dl>
 
-            {{-- El formulario de presupuesto sale ya con el estilo, el tema y el nombre de esta obra --}}
+            {{-- El formulario de contacto sale con el mensaje ya empezado con el nombre de esta obra --}}
             <div class="mt-10 flex flex-wrap items-center gap-4">
-                <a href="{{ route('encargos.create', ['obra' => $obra->slug]) }}" class="btn btn-primario">
-                    {{ $obra->available && $obra->price === null ? 'Consultar precio' : 'Pedir una obra parecida' }}
+                <a href="{{ route('paginas.contacto', ['obra' => $obra->slug]) }}#formulario-contacto" class="btn btn-primario">
+                    {{ $obra->available ? ($obra->price === null ? 'Consultar precio' : 'Me interesa') : 'Pedir una obra parecida' }}
                 </a>
-                <a href="{{ route('paginas.contacto') }}" class="enlace text-sm">¿Dudas? Escríbeme</a>
             </div>
         </div>
     </div>

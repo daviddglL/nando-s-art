@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Galeria\Catalogo;
 use Illuminate\Http\Response;
 
 class SitemapController extends Controller
 {
-    public function __invoke(): Response
+    public function __invoke(Catalogo $catalogo): Response
     {
-        $obras = Product::ordenadas()->get(['slug', 'updated_at']);
-
         return response()
-            ->view('sitemap', compact('obras'))
+            ->view('sitemap', ['obras' => $catalogo->todas()])
             ->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 
     // robots.txt dinámico para que apunte al sitemap con el dominio real
     public function robots(): Response
     {
-        $texto = "User-agent: *\nDisallow: /admin\n\nSitemap: ".route('sitemap')."\n";
+        $texto = "User-agent: *\nAllow: /\n\nSitemap: ".route('sitemap')."\n";
 
         return response($texto)->header('Content-Type', 'text/plain; charset=UTF-8');
     }

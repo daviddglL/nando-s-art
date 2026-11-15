@@ -13,9 +13,6 @@
                 <p class="antetitulo">Obra original</p>
                 <h1 id="titulo-galeria" class="titulo-pagina mt-3">Galería</h1>
             </div>
-            @if(Auth::user()?->isAdmin())
-                <a href="{{ route('products.create') }}" class="btn btn-primario btn-pequeno">+ Añadir nueva obra</a>
-            @endif
         </div>
 
         <!-- Estilos -->

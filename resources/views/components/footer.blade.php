@@ -1,13 +1,12 @@
 @php
-    // Los datos de contacto salen de la página Contacto que edita el artista en el panel
-    $contacto = \App\Models\Pagina::leer(\App\Models\Pagina::CONTACTO);
-    $usuarioInstagram = $contacto->instagram ? trim(\Illuminate\Support\Str::after($contacto->instagram, 'instagram.com/'), '/') : null;
+    // Los datos de contacto salen de resources/contenido/paginas.php
+    $contacto = \App\Galeria\Pagina::leer(\App\Galeria\Pagina::CONTACTO);
 @endphp
 <footer class="mt-24 bg-noche text-papel/75 grano">
     <div class="contenedor py-16 grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
             <p class="font-display text-3xl md:text-4xl text-papel leading-tight">¿Tienes una idea?<br><span class="italic text-acento-claro">Pintémosla juntos.</span></p>
-            <a href="{{ route('encargos.create') }}" class="btn btn-acento mt-6">Pedir un presupuesto</a>
+            <a href="{{ route('paginas.contacto') }}" class="btn btn-acento mt-6">Pedir un presupuesto</a>
         </div>
 
         <div>
@@ -27,9 +26,9 @@
                 @endif
                 @if ($contacto->instagram)
                     <li>
-                        <a href="{{ $contacto->instagram }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 hover:text-white" aria-label="Instagram de Nando's Art ({{ '@'.$usuarioInstagram }})">
+                        <a href="{{ $contacto->instagram }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 hover:text-white" aria-label="Instagram de Nando's Art ({{ $contacto->usuarioInstagram() }})">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5h-8.5zm4.25 3.25a5.25 5.25 0 1 1 0 10.5 5.25 5.25 0 0 1 0-10.5zm0 1.5a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5zm6 1.25a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>
-                            {{ '@'.$usuarioInstagram }}
+                            {{ $contacto->usuarioInstagram() }}
                         </a>
                     </li>
                 @endif
